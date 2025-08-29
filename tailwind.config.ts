@@ -61,11 +61,12 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
-      },
-      fontFamily: {
-        sans: ["var(--font-sans)"],
-        serif: ["var(--font-serif)"],
-        mono: ["var(--font-mono)"],
+        agricultural: {
+          DEFAULT: "hsl(142, 76%, 36%)",
+          hover: "hsl(142, 76%, 32%)",
+          light: "hsl(142, 76%, 40%)",
+          dark: "hsl(142, 76%, 28%)",
+        },
       },
       keyframes: {
         "accordion-down": {

@@ -1,64 +1,63 @@
-# Overview
+# GrainChain Platform
 
-This is a full-stack web application built with React frontend and Express.js backend, featuring a modern UI component library (shadcn/ui) and PostgreSQL database integration via Drizzle ORM. The application currently displays a simple "Hola mundo" welcome page but is architected to support scalable web application development with robust data management and user interface capabilities.
+## Overview
+This project is a full-stack web application for creating and managing grain and commodity trading contracts. Its purpose is to provide a modular and scalable platform covering the entire contract lifecycle, from buyer/seller management to contract creation and tracking. The application emphasizes a modern user experience, robust authentication, and efficient data management to streamline agricultural commodity trading.
 
-# User Preferences
-
+## User Preferences
 Preferred communication style: Simple, everyday language.
 
-# System Architecture
+## System Architecture
 
-## Frontend Architecture
-- **Framework**: React 18 with TypeScript, built using Vite for fast development and optimized production builds
-- **Routing**: Wouter for lightweight client-side routing
-- **UI Components**: shadcn/ui component library built on Radix UI primitives with Tailwind CSS for styling
-- **State Management**: TanStack Query (React Query) for server state management and data fetching
-- **Styling**: Tailwind CSS with CSS custom properties for theming and responsive design
+### Frontend
+- **Framework**: React 18 with TypeScript and Vite.
+- **UI/Styling**: Shadcn/ui (Radix UI primitives), Tailwind CSS with CSS variables, Microsoft Fluent UI styling.
+- **State Management**: Redux Toolkit with RTK Query.
+- **Forms**: React Hook Form with Zod validation.
+- **Internationalization**: i18next (Spanish/English).
+- **Theming**: Dark mode and an agricultural green theme with persistence.
+- **Routing**: Wouter for SPA navigation.
 
-## Backend Architecture
-- **Framework**: Express.js with TypeScript running on Node.js
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Database Provider**: Neon Database serverless PostgreSQL
-- **Development**: Hot module replacement with Vite integration for seamless full-stack development
+### Backend
+- **Framework**: Express.js with TypeScript.
+- **Authentication**: Auth0 integration with JWT, refresh, and access token management.
+- **API Structure**: RESTful endpoints (`/api` prefix).
 
-## Data Layer
-- **ORM**: Drizzle ORM with PostgreSQL dialect for type-safe database queries
-- **Schema**: Centralized schema definition in `shared/schema.ts` with Zod validation
-- **Migrations**: Drizzle Kit for database migrations and schema management
-- **Storage Interface**: Abstracted storage layer with both memory and database implementations
+### Project Structure
+- `client/src/`: Frontend code (components, services, features, pages, locales).
+- `server/`: Backend logic.
 
-## Authentication & Session Management
-- **Session Store**: PostgreSQL-backed sessions using connect-pg-simple
-- **User Model**: Basic user schema with username/password authentication ready for implementation
+### Key Features & Design Decisions
+- **Authentication**: Auth0 integration for secure login, token management, and protected routes.
+- **UI System**: Consistent design via Shadcn/ui, responsive layout with Tailwind CSS, and accessible components.
+- **Data Flow**: RTK Query for API calls, Redux for global state, and localStorage for persistent preferences.
+- **Form Management**: Extensive use of React Hook Form and Zod for type-safe and validated inputs.
+- **Dynamic Data Handling**: Dynamic configuration loading based on commodity selection, conditional pricing logic (fixed vs. basis), and robust flag validation.
+- **Reusable Components**: Agnostic `StandardTable`/`GenericTable` for data display, designed for reusability with business logic separated into external services.
+- **Contract Management**: Comprehensive contract deletion with confirmation modal, dynamic seller/buyer information display in contract details, and automatic data refresh after sub-contract creation.
+- **Sub-Contract Management**: Complete CRUD operations for sub-contracts including creation, editing, and deletion. Two-step API integration with Redis state management, comprehensive confirmation modals for data preview, automatic price calculation (future + basis = price), proper measurement unit ID handling, and successful navigation back to contract detail after operations.
+- **API Authentication**: Centralized `authenticatedFetch` interceptor for automatic JWT token and partition key header injection. ALL external API calls must use this interceptor except for explicitly excluded endpoints (Auth0 token exchange, public APIs). This ensures consistent authentication, error handling, and header management across the application. The interceptor automatically adds `created_by_id` and `created_by_name` to all PUT/POST requests from localStorage.
+- **Navigation**: Optimized navigation using Wouter's `setLocation()` for instant page transitions and consistent hierarchical navigation state management across all pages.
+- **Color Standards**: Consistent color schemes for pricing types (blue for fixed, purple for basis) applied across the UI for visual consistency.
 
-## Development & Build
-- **Build System**: Vite for frontend bundling, esbuild for backend compilation
-- **TypeScript**: Strict type checking across frontend, backend, and shared code
-- **Path Aliases**: Configured import aliases for clean code organization
-- **Environment**: Support for development and production environments with appropriate tooling
+## External Dependencies
 
-# External Dependencies
+### Core
+- `@reduxjs/toolkit`
+- `react-hook-form`
+- `zod`
+- `i18next`
 
-## Database & Storage
-- **Neon Database**: Serverless PostgreSQL provider for production database hosting
-- **Drizzle ORM**: Type-safe SQL toolkit and query builder for PostgreSQL
-- **connect-pg-simple**: PostgreSQL session store for Express sessions
+### UI
+- `@radix-ui/*`
+- `tailwindcss`
+- `class-variance-authority`
+- `lucide-react`
 
-## UI & Styling
-- **Radix UI**: Accessible, unstyled UI component primitives for complex components
-- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
-- **Lucide React**: Modern icon library with React components
-- **class-variance-authority**: Utility for creating type-safe CSS class variants
+### Development & Build Tools
+- `vite`
+- `tsx`
+- `esbuild`
 
-## Development Tools
-- **Vite**: Build tool and development server with hot module replacement
-- **TanStack Query**: Powerful data synchronization for React applications
-- **Wouter**: Minimalist routing library for React
-- **React Hook Form**: Performant, flexible forms with easy validation
-- **date-fns**: Modern JavaScript date utility library
-
-## Build & Runtime
-- **Express.js**: Fast, unopinionated web framework for Node.js
-- **esbuild**: Fast JavaScript bundler for backend compilation
-- **tsx**: TypeScript execution environment for development
-- **Zod**: TypeScript-first schema validation library
+### Third-Party Services
+- **Auth0**: User authentication and authorization.
+- **CRM API**: External CRM system.
