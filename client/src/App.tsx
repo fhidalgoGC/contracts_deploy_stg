@@ -14,7 +14,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { useStateRestoration } from "@/hooks/usePageState";
 import Login from "@/pages/Login";
 // Lazy load heavy pages for better code splitting
-const Home = lazy(() => import("@/pages/home"));
+const Home = lazy(() => import("@/pages/Home"));
 const Buyers = lazy(() => import("@/pages/Buyers"));
 const CreateBuyer = lazy(() => import("@/pages/CreateBuyer"));
 const CreateSeller = lazy(() => import("@/pages/CreateSeller"));
