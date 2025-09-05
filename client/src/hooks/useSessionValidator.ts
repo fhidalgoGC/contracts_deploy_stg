@@ -221,26 +221,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     console.log('🧹 SESSION CLEANUP: Iniciando limpieza de sesión...');
 
     try {
-      // PRIMERO: Notificar a otros tabs usando múltiples métodos
-      console.log('📡 Notificando a otros tabs sobre el logout...');
-      
-      // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
-      const channel = new BroadcastChannel('session_sync');
-      channel.postMessage({ type: 'FORCE_LOGOUT', timestamp: Date.now() });
-      channel.close();
-
-      // Método 2: Disparar evento customizado en la misma ventana
-      window.dispatchEvent(new CustomEvent('session_force_logout', { 
-        detail: { timestamp: Date.now() } 
-      }));
-
-      // Método 3: Usar localStorage como fallback
-      localStorage.setItem('session_logout', Date.now().toString());
-      setTimeout(() => {
-        localStorage.removeItem('session_logout');
-      }, 100);
-
-      // Limpiar tokens y datos de usuario
+      // Limpiar tokens y datos de usuario primero
       const keysToRemove = [
         'jwt', 'id_token', 'refresh_token', 'access_token',
         'user_name', 'user_lastname', 'user_id', 'user_email',
@@ -275,6 +256,26 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       // Redirigir al login
       console.log('🏠 Redirigiendo al login...');
       setLocation('/');
+      
+      // DESPUÉS de redirigir: Notificar a otros tabs sobre el logout completado
+      console.log('📡 Notificando a otros tabs sobre el logout completado...');
+      
+      // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
+      const channel = new BroadcastChannel('session_sync');
+      channel.postMessage({ type: 'FORCE_LOGOUT', timestamp: Date.now() });
+      channel.close();
+
+      // Método 2: Disparar evento customizado en la misma ventana
+      window.dispatchEvent(new CustomEvent('session_force_logout', { 
+        detail: { timestamp: Date.now() } 
+      }));
+
+      // Método 3: Usar localStorage como fallback
+      localStorage.setItem('session_logout', Date.now().toString());
+      setTimeout(() => {
+        localStorage.removeItem('session_logout');
+      }, 100);
+      
       console.log('✅ LOGOUT COMPLETE: Limpieza de sesión completada');
     } finally {
       isValidatingRef.current = false;
