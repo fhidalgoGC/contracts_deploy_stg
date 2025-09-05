@@ -140,11 +140,21 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     console.log('🧹 SESSION CLEANUP: Iniciando limpieza de sesión...');
 
     try {
-      // PRIMERO: Notificar a otros tabs ANTES de limpiar
+      // PRIMERO: Notificar a otros tabs usando múltiples métodos
       console.log('📡 Notificando a otros tabs sobre el logout...');
-      localStorage.setItem('session_logout', Date.now().toString());
       
-      // Esperar un poco para que el evento se propague
+      // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
+      const channel = new BroadcastChannel('session_sync');
+      channel.postMessage({ type: 'FORCE_LOGOUT', timestamp: Date.now() });
+      channel.close();
+
+      // Método 2: Disparar evento customizado en la misma ventana
+      window.dispatchEvent(new CustomEvent('session_force_logout', { 
+        detail: { timestamp: Date.now() } 
+      }));
+
+      // Método 3: Usar localStorage como fallback
+      localStorage.setItem('session_logout', Date.now().toString());
       setTimeout(() => {
         localStorage.removeItem('session_logout');
       }, 100);
@@ -242,54 +252,24 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     initializeSession();
   }, [validateOnMount, isAuthenticated, validateSession, clearSessionData]);
 
-  // 2. Validación periódica cada 5 segundos para detectar cambios rápidamente
+
+
+  // 2. Sincronización entre tabs usando múltiples métodos de eventos
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const interval = setInterval(() => {
-      console.log('⏰ PERIODIC CHECK: Validación periódica de sesión...');
-      validateSession();
-    }, 5000); // 5 segundos para detectar cambios más rápido
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, validateSession]);
-
-  // 3. Escuchar cambios en localStorage más agresivamente
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const checkTokensExist = () => {
-      const hasTokens = localStorage.getItem('access_token');
-      if (!hasTokens && isAuthenticated) {
-        console.log('🚨 TOKEN MISSING: Token removido, forzando logout...');
+    // Método 1: BroadcastChannel para comunicación directa entre tabs
+    const channel = new BroadcastChannel('session_sync');
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      console.log('📻 BROADCAST MESSAGE:', event.data);
+      if (event.data.type === 'FORCE_LOGOUT') {
+        console.log('🔗 SYNC TABS: Logout forzado por BroadcastChannel');
         clearSessionData();
       }
     };
+    channel.addEventListener('message', handleBroadcastMessage);
 
-    const interval = setInterval(checkTokensExist, 1000); // Cada segundo
-    return () => clearInterval(interval);
-  }, [isAuthenticated, clearSessionData]);
-
-  // 4. Detección de cambios de visibilidad del tab
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && isAuthenticated) {
-        // El tab volvió a ser visible - validar sesión
-        console.log('👁️ TAB VISIBILITY: Tab visible de nuevo, validando sesión...');
-        validateSession();
-      } else if (document.hidden && isAuthenticated) {
-        console.log('👁️ TAB VISIBILITY: Tab oculto (usuario cambió de pestaña)');
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isAuthenticated, validateSession]);
-
-  // 5. Sincronización entre tabs usando storage events
-  useEffect(() => {
+    // Método 2: Storage events (fallback)
     const handleStorageChange = (event: StorageEvent) => {
       console.log('🔗 STORAGE EVENT:', event.key, 'oldValue:', event.oldValue, 'newValue:', event.newValue);
       
@@ -321,11 +301,40 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       }
     };
 
+    // Método 3: Eventos personalizados (para la misma ventana)
+    const handleCustomLogout = () => {
+      console.log('🔗 SYNC TABS: Logout custom event detectado');
+      clearSessionData();
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('session_force_logout', handleCustomLogout);
+
     return () => {
+      channel.removeEventListener('message', handleBroadcastMessage);
+      channel.close();
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('session_force_logout', handleCustomLogout);
     };
   }, [isAuthenticated, clearSessionData]);
+
+  // 3. Detección de cambios de visibilidad del tab
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isAuthenticated) {
+        // El tab volvió a ser visible - validar sesión
+        console.log('👁️ TAB VISIBILITY: Tab visible de nuevo, validando sesión...');
+        validateSession();
+      } else if (document.hidden && isAuthenticated) {
+        console.log('👁️ TAB VISIBILITY: Tab oculto (usuario cambió de pestaña)');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, validateSession]);
 
   // Función expuesta para validar manualmente
   const forceValidateSession = useCallback(() => {
