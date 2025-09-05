@@ -69,8 +69,14 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     const loginTime = localStorage.getItem('login_time');
     const currentTime = Date.now();
 
+    console.log('🔍 SESSION VALIDATOR: Verificando estado de sesión...');
+    console.log('📅 Tiempo actual:', new Date(currentTime).toLocaleString());
+    console.log('🔑 Login time:', loginTime ? new Date(parseInt(loginTime)).toLocaleString() : 'No encontrado');
+    console.log('⚡ Last activity:', lastActivity ? new Date(parseInt(lastActivity)).toLocaleString() : 'No encontrado');
+
     // Si no hay datos de actividad o login, la sesión está expirada
     if (!lastActivity || !loginTime) {
+      console.log('❌ SESSION EXPIRED: Datos de sesión faltantes');
       return { expired: true, reason: 'missing_session_data' };
     }
 
@@ -81,30 +87,57 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     const maxSessionDurationMs = environment.MAX_SESSION_DURATION_MINUTES * 60 * 1000;
     const inactivityTimeoutMs = environment.INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
 
+    console.log('⚙️ Configuración de timeouts:');
+    console.log(`   Max session: ${environment.MAX_SESSION_DURATION_MINUTES} minutos (${maxSessionDurationMs}ms)`);
+    console.log(`   Inactividad: ${environment.INACTIVITY_TIMEOUT_MINUTES} minutos (${inactivityTimeoutMs}ms)`);
+
     // Verificar timeout absoluto (desde el login)
     const timeSinceLogin = currentTime - loginTimeMs;
+    const minutesSinceLogin = Math.floor(timeSinceLogin / (60 * 1000));
+    const sessionExpiresAt = new Date(loginTimeMs + maxSessionDurationMs);
+    
+    console.log(`⏰ Tiempo desde login: ${minutesSinceLogin} minutos`);
+    console.log(`🕐 Sesión expira absolutamente a: ${sessionExpiresAt.toLocaleString()}`);
+
     if (timeSinceLogin > maxSessionDurationMs) {
+      console.log('❌ SESSION EXPIRED: Tiempo máximo de sesión excedido');
+      console.log(`   Límite: ${environment.MAX_SESSION_DURATION_MINUTES} minutos`);
+      console.log(`   Transcurrido: ${minutesSinceLogin} minutos`);
       return { expired: true, reason: 'max_session_duration' };
     }
 
     // Verificar timeout de inactividad
     const timeSinceActivity = currentTime - lastActivityTime;
+    const minutesSinceActivity = Math.floor(timeSinceActivity / (60 * 1000));
+    const inactivityExpiresAt = new Date(lastActivityTime + inactivityTimeoutMs);
+    
+    console.log(`💤 Tiempo desde última actividad: ${minutesSinceActivity} minutos`);
+    console.log(`🕐 Sesión expira por inactividad a: ${inactivityExpiresAt.toLocaleString()}`);
+
     if (timeSinceActivity > inactivityTimeoutMs) {
+      console.log('❌ SESSION EXPIRED: Timeout de inactividad excedido');
+      console.log(`   Límite: ${environment.INACTIVITY_TIMEOUT_MINUTES} minutos`);
+      console.log(`   Inactivo por: ${minutesSinceActivity} minutos`);
       return { expired: true, reason: 'inactivity_timeout' };
     }
 
+    console.log('✅ SESSION VALID: Sesión activa y dentro de límites');
     return { expired: false };
   }, []);
 
   // Función para actualizar la última actividad
   const updateLastActivity = useCallback(() => {
-    localStorage.setItem('last_activity', Date.now().toString());
+    const now = Date.now();
+    localStorage.setItem('last_activity', now.toString());
+    console.log('⚡ ACTIVITY UPDATE: Última actividad actualizada a:', new Date(now).toLocaleString());
   }, []);
 
   // Función para limpiar la sesión
   const clearSessionData = useCallback(() => {
     if (isValidatingRef.current) return;
     isValidatingRef.current = true;
+
+    console.log('🧹 SESSION CLEANUP: Iniciando limpieza de sesión...');
 
     try {
       // Crear un evento personalizado para notificar a otros tabs
@@ -128,16 +161,20 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         'last_activity', 'login_time'
       ];
 
+      console.log('🗑️ Removiendo datos del localStorage:', keysToRemove);
       keysToRemove.forEach(key => localStorage.removeItem(key));
 
       // Limpiar contextos
+      console.log('🔄 Limpiando contextos Redux y usuario...');
       clearSession();
       dispatch(logoutAction());
 
       // Disparar evento para otros tabs
+      console.log('📡 Notificando a otros tabs sobre el logout...');
       window.dispatchEvent(logoutEvent);
 
       if (showExpirationToast) {
+        console.log('🔔 Mostrando notificación de sesión expirada');
         toast({
           title: "Sesión expirada",
           description: "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
@@ -146,7 +183,9 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       }
 
       // Redirigir al login
+      console.log('🏠 Redirigiendo al login...');
       setLocation('/');
+      console.log('✅ LOGOUT COMPLETE: Limpieza de sesión completada');
     } finally {
       isValidatingRef.current = false;
     }
@@ -156,9 +195,12 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   const validateSession = useCallback((): boolean => {
     if (isValidatingRef.current) return false;
 
+    console.log('🔐 SESSION VALIDATION: Iniciando validación de sesión...');
+
     // Verificar si hay tokens válidos
     const tokensValid = validateTokens();
     if (!tokensValid) {
+      console.log('❌ VALIDATION FAILED: Tokens inválidos o faltantes');
       clearSessionData();
       return false;
     }
@@ -166,12 +208,13 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     // Verificar si la sesión ha expirado por tiempo
     const sessionStatus = isSessionExpired();
     if (sessionStatus.expired) {
-      console.log(`Session expired: ${sessionStatus.reason}`);
+      console.log(`❌ VALIDATION FAILED: Sesión expirada por ${sessionStatus.reason}`);
       clearSessionData();
       return false;
     }
 
     // Si llegamos aquí, la sesión es válida - actualizar última actividad
+    console.log('✅ VALIDATION SUCCESS: Sesión válida, actualizando actividad...');
     updateLastActivity();
     return true;
   }, [validateTokens, isSessionExpired, clearSessionData, updateLastActivity]);
@@ -206,7 +249,10 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     const handleVisibilityChange = () => {
       if (!document.hidden && isAuthenticated) {
         // El tab volvió a ser visible - validar sesión
+        console.log('👁️ TAB VISIBILITY: Tab visible de nuevo, validando sesión...');
         validateSession();
+      } else if (document.hidden && isAuthenticated) {
+        console.log('👁️ TAB VISIBILITY: Tab oculto (usuario cambió de pestaña)');
       }
     };
 
@@ -221,19 +267,21 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     const handleStorageChange = (event: StorageEvent) => {
       // Si otro tab removió los tokens, cerrar sesión aquí también
       if (event.key === 'access_token' && !event.newValue && isAuthenticated) {
+        console.log('🔗 SYNC TABS: Token removido en otro tab, cerrando sesión aquí...');
         clearSessionData();
         return;
       }
 
       // Si se disparó un evento de logout desde otro tab
       if (event.key === 'session_logout' && event.newValue && isAuthenticated) {
+        console.log('🔗 SYNC TABS: Logout detectado en otro tab, cerrando sesión aquí...');
         clearSessionData();
         return;
       }
 
       // Si se actualizó la última actividad en otro tab
       if (event.key === 'last_activity' && event.newValue) {
-        // No hacer nada especial, solo mantener sincronizada la actividad
+        console.log('🔗 SYNC TABS: Actividad actualizada en otro tab:', new Date(parseInt(event.newValue)).toLocaleString());
         return;
       }
     };

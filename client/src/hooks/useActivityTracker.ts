@@ -30,6 +30,7 @@ export const useActivityTracker = (options: ActivityTrackerOptions = {}) => {
     // Solo actualizar si ha pasado el tiempo de throttle
     if (!lastActivity || (now - parseInt(lastActivity)) > throttleTime) {
       localStorage.setItem('last_activity', now.toString());
+      console.log('🎯 USER ACTIVITY: Actividad detectada, actualizando timestamp:', new Date(now).toLocaleString());
     }
   }, [isAuthenticated, throttleTime]);
 

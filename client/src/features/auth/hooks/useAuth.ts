@@ -36,6 +36,7 @@ export const useAuth = () => {
       const loginTime = Date.now().toString();
       localStorage.setItem("login_time", loginTime);
       localStorage.setItem("last_activity", loginTime);
+      console.log('🚀 LOGIN: Sesión iniciada - timestamps guardados:', new Date(parseInt(loginTime)).toLocaleString());
 
       // After successful login, fetch user identity using organization service
       const { organizationService } = await import(
