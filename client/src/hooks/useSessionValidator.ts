@@ -343,8 +343,6 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
 
     // Método 2: Storage events (fallback)
     const handleStorageChange = (event: StorageEvent) => {
-      console.log('🔗 STORAGE EVENT:', event.key, 'oldValue:', event.oldValue, 'newValue:', event.newValue);
-      
       // Si otro tab removió los tokens, cerrar sesión aquí también
       if (event.key === 'access_token' && !event.newValue && isAuthenticated) {
         console.log('🔗 SYNC TABS: Token removido en otro tab, cerrando sesión aquí...');
@@ -366,9 +364,8 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         return;
       }
 
-      // Si se actualizó la última actividad en otro tab
+      // Si se actualizó la última actividad en otro tab (sin log)
       if (event.key === 'last_activity' && event.newValue) {
-        console.log('🔗 SYNC TABS: Actividad actualizada en otro tab:', new Date(parseInt(event.newValue)).toLocaleString());
         return;
       }
     };
