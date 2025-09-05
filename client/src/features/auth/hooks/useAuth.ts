@@ -38,16 +38,6 @@ export const useAuth = () => {
       localStorage.setItem("last_activity", loginTime);
       console.log('🚀 LOGIN: Sesión iniciada - timestamps guardados:', new Date(parseInt(loginTime)).toLocaleString());
 
-      // Notificar a otras pestañas que se completó el login
-      try {
-        const channel = new BroadcastChannel('session_sync');
-        channel.postMessage({ type: 'LOGIN_COMPLETED', timestamp: Date.now() });
-        channel.close();
-        console.log('📡 LOGIN: Notificando login completado a otras pestañas');
-      } catch (error) {
-        console.log('📻 LOGIN: No se pudo notificar a otros tabs:', error);
-      }
-
       // After successful login, fetch user identity using organization service
       const { organizationService } = await import(
         "@/services/organization.service"
@@ -123,6 +113,19 @@ export const useAuth = () => {
 
       setTimeout(() => {
         setLocation("/home");
+        
+        // Notificar a otras pestañas que se completó TODO el proceso de login
+        // (solo después de que navegamos exitosamente al home)
+        setTimeout(() => {
+          try {
+            const channel = new BroadcastChannel('session_sync');
+            channel.postMessage({ type: 'LOGIN_COMPLETED', timestamp: Date.now() });
+            channel.close();
+            console.log('📡 LOGIN: Login completado - notificando a otras pestañas');
+          } catch (error) {
+            console.log('📻 LOGIN: No se pudo notificar a otros tabs:', error);
+          }
+        }, 500); // Pequeño delay adicional para asegurar que la navegación esté completa
       }, 1000);
 
       return true;
