@@ -353,9 +353,22 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         clearSessionData();
       } else if (event.data.type === 'CONTEXT_RESTORED') {
         console.log('🔗 SYNC TABS: Contexto restaurado en otro tab, sincronizando...');
-        // Solo restaurar si esta pestaña no está autenticada
+        // Solo restaurar si esta pestaña no está autenticada pero hay tokens
         if (!isAuthenticated && localStorage.getItem('access_token')) {
+          console.log('🔄 SYNC TABS: Forzando restauración de contexto completo...');
           restoreReduxStateFromStorage();
+          
+          // También forzar recarga de la página para activar todos los contextos
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      } else if (event.data.type === 'LOGIN_COMPLETED') {
+        console.log('🔗 SYNC TABS: Login completado en otro tab, verificando...');
+        // Si hay tokens válidos pero no estamos autenticados, restaurar
+        if (!isAuthenticated && localStorage.getItem('access_token')) {
+          console.log('🔄 SYNC TABS: Forzando recarga para sincronizar login...');
+          window.location.reload();
         }
       }
     };
