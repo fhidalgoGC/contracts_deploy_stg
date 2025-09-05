@@ -111,22 +111,18 @@ export const useAuth = () => {
         description: t("loginSuccessMessage"),
       });
 
-      setTimeout(() => {
-        setLocation("/home");
-        
-        // Notificar a otras pestañas que se completó TODO el proceso de login
-        // (solo después de que navegamos exitosamente al home)
-        setTimeout(() => {
-          try {
-            const channel = new BroadcastChannel('session_sync');
-            channel.postMessage({ type: 'LOGIN_COMPLETED', timestamp: Date.now() });
-            channel.close();
-            console.log('📡 LOGIN: Login completado - notificando a otras pestañas');
-          } catch (error) {
-            console.log('📻 LOGIN: No se pudo notificar a otros tabs:', error);
-          }
-        }, 500); // Pequeño delay adicional para asegurar que la navegación esté completa
-      }, 1000);
+      // Navegar al home inmediatamente
+      setLocation("/home");
+      
+      // Notificar a otras pestañas que se completó el login
+      try {
+        const channel = new BroadcastChannel('session_sync');
+        channel.postMessage({ type: 'LOGIN_COMPLETED', timestamp: Date.now() });
+        channel.close();
+        console.log('📡 LOGIN: Login completado - notificando a otras pestañas');
+      } catch (error) {
+        console.log('📻 LOGIN: No se pudo notificar a otros tabs:', error);
+      }
 
       return true;
     } catch (err: any) {

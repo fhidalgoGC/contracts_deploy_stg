@@ -186,13 +186,10 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
             const availableOrgs = JSON.parse(availableOrgsString);
             console.log('🏢 ORGANIZATIONS RESTORE: Organizaciones disponibles encontradas, restaurando...');
             
-            // Simular la carga de organizaciones usando los datos guardados
-            // Esto activará el contexto de organizaciones
-            setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('restore_organizations', {
-                detail: { organizationData: availableOrgs }
-              }));
-            }, 500);
+            // Disparar evento inmediato para restaurar organizaciones
+            window.dispatchEvent(new CustomEvent('restore_organizations', {
+              detail: { organizationData: availableOrgs }
+            }));
           } catch (error) {
             console.log('⚠️ ORGANIZATIONS RESTORE: Error parseando organizaciones disponibles:', error);
           }
@@ -312,7 +309,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     return true;
   }, [validateTokens, isSessionExpired, clearSessionData, updateLastActivity]);
 
-  // 1. Validación automática al cargar la página (con delay para evitar interferir con login)
+  // 1. Validación automática al cargar la página
   useEffect(() => {
     if (!validateOnMount) return;
 
@@ -322,28 +319,21 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       if (hasTokens && !isAuthenticated) {
         // Hay tokens pero Redux no está autenticado - validar y restaurar
         console.log('🔄 CONTEXT RESTORE: Nueva pestaña detectada, restaurando contexto...');
-        
-        // Pequeño delay para asegurar que no interfiera con login reciente
-        setTimeout(() => {
-          if (!validateSession()) {
-            return;
-          }
-          // Restaurar el estado de Redux desde localStorage
-          restoreReduxStateFromStorage();
-        }, 2000);
+        if (!validateSession()) {
+          return;
+        }
+        // Restaurar el estado de Redux desde localStorage
+        restoreReduxStateFromStorage();
       } else if (!hasTokens && isAuthenticated) {
         // Redux dice que está autenticado pero no hay tokens - limpiar
         clearSessionData();
       } else if (hasTokens && isAuthenticated) {
-        // Ambos tienen datos - validar sesión (con delay)
-        setTimeout(() => {
-          validateSession();
-        }, 1000);
+        // Ambos tienen datos - validar sesión
+        validateSession();
       }
     };
 
-    // Delay inicial para evitar interferir con login
-    setTimeout(initializeSession, 1000);
+    initializeSession();
   }, [validateOnMount, isAuthenticated, validateSession, clearSessionData]);
 
 
@@ -367,13 +357,10 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         }
       } else if (event.data.type === 'LOGIN_COMPLETED') {
         console.log('🔗 SYNC TABS: Login completado en otro tab, verificando...');
-        // Si hay tokens válidos pero no estamos autenticados, restaurar sin recarga
+        // Si hay tokens válidos pero no estamos autenticados, restaurar
         if (!isAuthenticated && localStorage.getItem('access_token')) {
           console.log('🔄 SYNC TABS: Restaurando contexto por login en otro tab...');
-          // Esperar un poco para que se complete el login en la otra pestaña
-          setTimeout(() => {
-            restoreReduxStateFromStorage();
-          }, 1500);
+          restoreReduxStateFromStorage();
         }
       }
     };
