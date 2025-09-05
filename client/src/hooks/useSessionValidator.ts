@@ -179,6 +179,25 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
           }
         }));
 
+        // También restaurar datos del UserContext si están disponibles
+        const availableOrgsString = localStorage.getItem('available_organizations');
+        if (availableOrgsString) {
+          try {
+            const availableOrgs = JSON.parse(availableOrgsString);
+            console.log('🏢 ORGANIZATIONS RESTORE: Organizaciones disponibles encontradas, restaurando...');
+            
+            // Simular la carga de organizaciones usando los datos guardados
+            // Esto activará el contexto de organizaciones
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('restore_organizations', {
+                detail: { organizationData: availableOrgs }
+              }));
+            }, 500);
+          } catch (error) {
+            console.log('⚠️ ORGANIZATIONS RESTORE: Error parseando organizaciones disponibles:', error);
+          }
+        }
+
         // Notificar a otros tabs que se restauró el contexto
         try {
           const channel = new BroadcastChannel('session_sync');
@@ -235,6 +254,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         'company_business_name', 'company_business_type',
         'company_calling_code', 'company_phone_number', 'company_address_line',
         'current_organization_id', 'current_organization_name', 'organization_details',
+        'available_organizations', // ← Nuevo: limpiar organizaciones disponibles
         'last_activity', 'login_time'
       ];
 
