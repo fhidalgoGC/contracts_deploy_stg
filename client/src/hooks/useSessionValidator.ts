@@ -140,12 +140,14 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     console.log('🧹 SESSION CLEANUP: Iniciando limpieza de sesión...');
 
     try {
-      // Crear un evento personalizado para notificar a otros tabs
-      const logoutEvent = new StorageEvent('storage', {
-        key: 'session_logout',
-        newValue: Date.now().toString(),
-        oldValue: null
-      });
+      // PRIMERO: Notificar a otros tabs ANTES de limpiar
+      console.log('📡 Notificando a otros tabs sobre el logout...');
+      localStorage.setItem('session_logout', Date.now().toString());
+      
+      // Esperar un poco para que el evento se propague
+      setTimeout(() => {
+        localStorage.removeItem('session_logout');
+      }, 100);
 
       // Limpiar tokens y datos de usuario
       const keysToRemove = [
@@ -168,10 +170,6 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       console.log('🔄 Limpiando contextos Redux y usuario...');
       clearSession();
       dispatch(logoutAction());
-
-      // Disparar evento para otros tabs
-      console.log('📡 Notificando a otros tabs sobre el logout...');
-      window.dispatchEvent(logoutEvent);
 
       if (showExpirationToast) {
         console.log('🔔 Mostrando notificación de sesión expirada');
@@ -244,6 +242,34 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     initializeSession();
   }, [validateOnMount, isAuthenticated, validateSession, clearSessionData]);
 
+  // 2. Validación periódica cada 5 segundos para detectar cambios rápidamente
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const interval = setInterval(() => {
+      console.log('⏰ PERIODIC CHECK: Validación periódica de sesión...');
+      validateSession();
+    }, 5000); // 5 segundos para detectar cambios más rápido
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, validateSession]);
+
+  // 3. Escuchar cambios en localStorage más agresivamente
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const checkTokensExist = () => {
+      const hasTokens = localStorage.getItem('access_token');
+      if (!hasTokens && isAuthenticated) {
+        console.log('🚨 TOKEN MISSING: Token removido, forzando logout...');
+        clearSessionData();
+      }
+    };
+
+    const interval = setInterval(checkTokensExist, 1000); // Cada segundo
+    return () => clearInterval(interval);
+  }, [isAuthenticated, clearSessionData]);
+
   // 4. Detección de cambios de visibilidad del tab
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -265,9 +291,18 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   // 5. Sincronización entre tabs usando storage events
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
+      console.log('🔗 STORAGE EVENT:', event.key, 'oldValue:', event.oldValue, 'newValue:', event.newValue);
+      
       // Si otro tab removió los tokens, cerrar sesión aquí también
       if (event.key === 'access_token' && !event.newValue && isAuthenticated) {
         console.log('🔗 SYNC TABS: Token removido en otro tab, cerrando sesión aquí...');
+        clearSessionData();
+        return;
+      }
+
+      // Si otro tab removió cualquier token crítico
+      if (['jwt', 'id_token', 'refresh_token'].includes(event.key as string) && !event.newValue && isAuthenticated) {
+        console.log(`🔗 SYNC TABS: Token crítico ${event.key} removido en otro tab, cerrando sesión aquí...`);
         clearSessionData();
         return;
       }
