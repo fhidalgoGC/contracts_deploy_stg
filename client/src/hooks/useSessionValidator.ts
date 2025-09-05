@@ -312,7 +312,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     return true;
   }, [validateTokens, isSessionExpired, clearSessionData, updateLastActivity]);
 
-  // 1. Validación automática al cargar la página
+  // 1. Validación automática al cargar la página (con delay para evitar interferir con login)
   useEffect(() => {
     if (!validateOnMount) return;
 
@@ -322,21 +322,28 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       if (hasTokens && !isAuthenticated) {
         // Hay tokens pero Redux no está autenticado - validar y restaurar
         console.log('🔄 CONTEXT RESTORE: Nueva pestaña detectada, restaurando contexto...');
-        if (!validateSession()) {
-          return;
-        }
-        // Restaurar el estado de Redux desde localStorage
-        restoreReduxStateFromStorage();
+        
+        // Pequeño delay para asegurar que no interfiera con login reciente
+        setTimeout(() => {
+          if (!validateSession()) {
+            return;
+          }
+          // Restaurar el estado de Redux desde localStorage
+          restoreReduxStateFromStorage();
+        }, 2000);
       } else if (!hasTokens && isAuthenticated) {
         // Redux dice que está autenticado pero no hay tokens - limpiar
         clearSessionData();
       } else if (hasTokens && isAuthenticated) {
-        // Ambos tienen datos - validar sesión
-        validateSession();
+        // Ambos tienen datos - validar sesión (con delay)
+        setTimeout(() => {
+          validateSession();
+        }, 1000);
       }
     };
 
-    initializeSession();
+    // Delay inicial para evitar interferir con login
+    setTimeout(initializeSession, 1000);
   }, [validateOnMount, isAuthenticated, validateSession, clearSessionData]);
 
 
@@ -355,20 +362,18 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         console.log('🔗 SYNC TABS: Contexto restaurado en otro tab, sincronizando...');
         // Solo restaurar si esta pestaña no está autenticada pero hay tokens
         if (!isAuthenticated && localStorage.getItem('access_token')) {
-          console.log('🔄 SYNC TABS: Forzando restauración de contexto completo...');
+          console.log('🔄 SYNC TABS: Restaurando contexto desde evento...');
           restoreReduxStateFromStorage();
-          
-          // También forzar recarga de la página para activar todos los contextos
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
         }
       } else if (event.data.type === 'LOGIN_COMPLETED') {
         console.log('🔗 SYNC TABS: Login completado en otro tab, verificando...');
-        // Si hay tokens válidos pero no estamos autenticados, restaurar
+        // Si hay tokens válidos pero no estamos autenticados, restaurar sin recarga
         if (!isAuthenticated && localStorage.getItem('access_token')) {
-          console.log('🔄 SYNC TABS: Forzando recarga para sincronizar login...');
-          window.location.reload();
+          console.log('🔄 SYNC TABS: Restaurando contexto por login en otro tab...');
+          // Esperar un poco para que se complete el login en la otra pestaña
+          setTimeout(() => {
+            restoreReduxStateFromStorage();
+          }, 1500);
         }
       }
     };
