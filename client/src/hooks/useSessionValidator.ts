@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { logout as logoutAction } from '@/features/auth/slices/authSlice';
+import { logout as logoutAction, login as loginAction } from '@/features/auth/slices/authSlice';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import { environment } from '@/environment/environment';
@@ -132,6 +132,71 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     console.log('⚡ ACTIVITY UPDATE: Última actividad actualizada a:', new Date(now).toLocaleString());
   }, []);
 
+  // Función para restaurar el estado de Redux desde localStorage
+  const restoreReduxStateFromStorage = useCallback(() => {
+    console.log('🔄 REDUX RESTORE: Restaurando estado desde localStorage...');
+    
+    try {
+      // Obtener todos los datos del usuario desde localStorage
+      const userData = {
+        user_id: localStorage.getItem('user_id'),
+        user_name: localStorage.getItem('user_name'),
+        user_lastname: localStorage.getItem('user_lastname'),
+        user_email: localStorage.getItem('user_email'),
+        partition_key: localStorage.getItem('partition_key'),
+        representative_people_id: localStorage.getItem('representative_people_id'),
+        representative_people_full_name: localStorage.getItem('representative_people_full_name'),
+        representative_people_first_name: localStorage.getItem('representative_people_first_name'),
+        representative_people_last_name: localStorage.getItem('representative_people_last_name'),
+        representative_people_email: localStorage.getItem('representative_people_email'),
+        representative_people_calling_code: localStorage.getItem('representative_people_calling_code'),
+        representative_people_phone_number: localStorage.getItem('representative_people_phone_number'),
+        company_business_name: localStorage.getItem('company_business_name'),
+        company_business_type: localStorage.getItem('company_business_type'),
+        company_calling_code: localStorage.getItem('company_calling_code'),
+        company_phone_number: localStorage.getItem('company_phone_number'),
+        company_address_line: localStorage.getItem('company_address_line'),
+        current_organization_id: localStorage.getItem('current_organization_id'),
+        current_organization_name: localStorage.getItem('current_organization_name'),
+        organization_details: localStorage.getItem('organization_details')
+      };
+
+      // Solo restaurar si tenemos datos básicos del usuario
+      if (userData.user_id && userData.user_email) {
+        console.log('✅ REDUX RESTORE: Datos encontrados, restaurando contexto de usuario...');
+        
+        // Disparar la acción de login en Redux para restaurar el estado
+        dispatch(loginAction({
+          user: {
+            email: userData.user_email,
+            name: userData.user_name ? `${userData.user_name} ${userData.user_lastname || ''}`.trim() : undefined,
+            picture: undefined
+          },
+          tokens: {
+            accessToken: localStorage.getItem('access_token') || '',
+            refreshToken: localStorage.getItem('refresh_token') || '',
+            idToken: localStorage.getItem('id_token') || ''
+          }
+        }));
+
+        // Notificar a otros tabs que se restauró el contexto
+        try {
+          const channel = new BroadcastChannel('session_sync');
+          channel.postMessage({ type: 'CONTEXT_RESTORED', timestamp: Date.now() });
+          channel.close();
+        } catch (error) {
+          console.log('📻 BROADCAST: No se pudo notificar a otros tabs:', error);
+        }
+
+        console.log('🎉 CONTEXT RESTORED: Estado de Redux restaurado exitosamente');
+      } else {
+        console.log('⚠️ REDUX RESTORE: Datos insuficientes para restaurar el contexto');
+      }
+    } catch (error) {
+      console.error('❌ REDUX RESTORE ERROR:', error);
+    }
+  }, [dispatch]);
+
   // Función para limpiar la sesión
   const clearSessionData = useCallback(() => {
     if (isValidatingRef.current) return;
@@ -235,11 +300,13 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       const hasTokens = localStorage.getItem('access_token');
       
       if (hasTokens && !isAuthenticated) {
-        // Hay tokens pero Redux no está autenticado - validar
+        // Hay tokens pero Redux no está autenticado - validar y restaurar
+        console.log('🔄 CONTEXT RESTORE: Nueva pestaña detectada, restaurando contexto...');
         if (!validateSession()) {
           return;
         }
-        // Aquí podrías restaurar el estado de Redux si es necesario
+        // Restaurar el estado de Redux desde localStorage
+        restoreReduxStateFromStorage();
       } else if (!hasTokens && isAuthenticated) {
         // Redux dice que está autenticado pero no hay tokens - limpiar
         clearSessionData();
@@ -256,7 +323,6 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
 
   // 2. Sincronización entre tabs usando múltiples métodos de eventos
   useEffect(() => {
-    if (!isAuthenticated) return;
 
     // Método 1: BroadcastChannel para comunicación directa entre tabs
     const channel = new BroadcastChannel('session_sync');
@@ -265,6 +331,12 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       if (event.data.type === 'FORCE_LOGOUT') {
         console.log('🔗 SYNC TABS: Logout forzado por BroadcastChannel');
         clearSessionData();
+      } else if (event.data.type === 'CONTEXT_RESTORED') {
+        console.log('🔗 SYNC TABS: Contexto restaurado en otro tab, sincronizando...');
+        // Solo restaurar si esta pestaña no está autenticada
+        if (!isAuthenticated && localStorage.getItem('access_token')) {
+          restoreReduxStateFromStorage();
+        }
       }
     };
     channel.addEventListener('message', handleBroadcastMessage);
