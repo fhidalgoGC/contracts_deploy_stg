@@ -12,6 +12,7 @@ import { useEffect, lazy, Suspense } from "react";
 import "./common/utils/i18n";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { useStateRestoration } from "@/hooks/usePageState";
+import { SessionValidator } from "@/components/SessionValidator";
 import Login from "@/pages/Login";
 // Lazy load heavy pages for better code splitting
 const Home = lazy(() => import("@/pages/Home"));
@@ -79,12 +80,12 @@ function AppContent() {
   const { isLoadingOrganizations } = useUser();
   
   return (
-    <>
+    <SessionValidator>
       <StateRestorer />
       <Toaster />
       <Router />
       <LoadingOverlay isVisible={isLoadingOrganizations} message="Cambiando organización..." />
-    </>
+    </SessionValidator>
   );
 }
 

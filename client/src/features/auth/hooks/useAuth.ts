@@ -32,6 +32,8 @@ export const useAuth = () => {
       localStorage.setItem("id_token", result.id_token); // Also store as id_token for characteristics endpoint
       localStorage.setItem("refresh_token", result.refresh_token);
       localStorage.setItem("access_token", result.access_token);
+      // Set initial last activity time
+      localStorage.setItem("last_activity", Date.now().toString());
 
       // After successful login, fetch user identity using organization service
       const { organizationService } = await import(
@@ -285,6 +287,7 @@ export const useAuth = () => {
     localStorage.removeItem("current_organization_id");
     localStorage.removeItem("current_organization_name");
     localStorage.removeItem("organization_details");
+    localStorage.removeItem("last_activity");
 
     // Clear session context
     clearSession();
