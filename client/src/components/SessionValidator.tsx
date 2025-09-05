@@ -16,7 +16,6 @@ interface SessionValidatorProps {
 export function SessionValidator({ children }: SessionValidatorProps) {
   // Configurar el hook de validación de sesión
   useSessionValidator({
-    sessionTimeout: 24 * 60 * 60 * 1000, // 24 horas
     showExpirationToast: true,
     validateOnMount: true
   });

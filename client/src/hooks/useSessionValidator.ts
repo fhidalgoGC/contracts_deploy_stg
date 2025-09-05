@@ -4,10 +4,9 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout as logoutAction } from '@/features/auth/slices/authSlice';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
+import { environment } from '@/environment/environment';
 
 interface SessionValidatorOptions {
-  // Tiempo en milisegundos para considerar una sesión como expirada (default: 24 horas)
-  sessionTimeout?: number;
   // Si se debe mostrar un toast cuando la sesión expira
   showExpirationToast?: boolean;
   // Si se debe validar al cargar la página
@@ -16,7 +15,6 @@ interface SessionValidatorOptions {
 
 export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   const {
-    sessionTimeout = 24 * 60 * 60 * 1000, // 24 horas por defecto
     showExpirationToast = true,
     validateOnMount = true
   } = options;
@@ -65,18 +63,38 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     }
   }, []);
 
-  // Función para verificar si la sesión está expirada por tiempo
-  const isSessionExpired = useCallback((): boolean => {
+  // Función para verificar si la sesión ha expirado por alguno de los dos timeouts
+  const isSessionExpired = useCallback((): { expired: boolean; reason?: string } => {
     const lastActivity = localStorage.getItem('last_activity');
-    if (!lastActivity) {
-      return true;
+    const loginTime = localStorage.getItem('login_time');
+    const currentTime = Date.now();
+
+    // Si no hay datos de actividad o login, la sesión está expirada
+    if (!lastActivity || !loginTime) {
+      return { expired: true, reason: 'missing_session_data' };
     }
 
     const lastActivityTime = parseInt(lastActivity, 10);
-    const currentTime = Date.now();
-    
-    return (currentTime - lastActivityTime) > sessionTimeout;
-  }, [sessionTimeout]);
+    const loginTimeMs = parseInt(loginTime, 10);
+
+    // Convertir minutos a milisegundos
+    const maxSessionDurationMs = environment.MAX_SESSION_DURATION_MINUTES * 60 * 1000;
+    const inactivityTimeoutMs = environment.INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
+
+    // Verificar timeout absoluto (desde el login)
+    const timeSinceLogin = currentTime - loginTimeMs;
+    if (timeSinceLogin > maxSessionDurationMs) {
+      return { expired: true, reason: 'max_session_duration' };
+    }
+
+    // Verificar timeout de inactividad
+    const timeSinceActivity = currentTime - lastActivityTime;
+    if (timeSinceActivity > inactivityTimeoutMs) {
+      return { expired: true, reason: 'inactivity_timeout' };
+    }
+
+    return { expired: false };
+  }, []);
 
   // Función para actualizar la última actividad
   const updateLastActivity = useCallback(() => {
@@ -107,7 +125,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         'company_business_name', 'company_business_type',
         'company_calling_code', 'company_phone_number', 'company_address_line',
         'current_organization_id', 'current_organization_name', 'organization_details',
-        'last_activity'
+        'last_activity', 'login_time'
       ];
 
       keysToRemove.forEach(key => localStorage.removeItem(key));
@@ -146,7 +164,9 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     }
 
     // Verificar si la sesión ha expirado por tiempo
-    if (isSessionExpired()) {
+    const sessionStatus = isSessionExpired();
+    if (sessionStatus.expired) {
+      console.log(`Session expired: ${sessionStatus.reason}`);
       clearSessionData();
       return false;
     }
@@ -238,6 +258,6 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     validateSession: forceValidateSession,
     logout: forceLogout,
     updateLastActivity,
-    isSessionValid: isAuthenticated && validateTokens() && !isSessionExpired()
+    isSessionValid: isAuthenticated && validateTokens() && !isSessionExpired().expired
   };
 };
