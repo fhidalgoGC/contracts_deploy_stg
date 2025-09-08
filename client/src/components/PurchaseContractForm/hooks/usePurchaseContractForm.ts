@@ -444,7 +444,42 @@ export function usePurchaseContractForm(options: UsePurchaseContractFormOptions 
       },
       status: 'created',
       contract_date: new Date(formData.contract_date).toISOString(),
-      notes: [],
+      notes: (() => {
+        const processedNotes: Array<{ 
+          people_id: string; 
+          people_name: string; 
+          text: string; 
+          date: string; 
+        }> = [];
+        
+        // Get user data from localStorage
+        const userId = localStorage.getItem('user_id') || '';
+        const firstName = localStorage.getItem('user_name') || '';
+        const lastName = localStorage.getItem('user_lastname') || '';
+        const userName = `${firstName} ${lastName}`.trim();
+        
+        // Process each comment from the remarks
+        (formData.remarks || [])
+          .filter(remark => remark.startsWith('COMMENT:'))
+          .forEach(remark => {
+            const commentText = remark.replace('COMMENT:', '').trim();
+            
+            // Skip empty comments
+            if (!commentText) {
+              return;
+            }
+            
+            // Add observation with current timestamp
+            processedNotes.push({
+              people_id: userId,
+              people_name: userName,
+              text: commentText,
+              date: new Date().toISOString()
+            });
+          });
+        
+        return processedNotes;
+      })(),
       remarks: (() => {
         const processedRemarks: Array<{ title: string; values: string[] }> = [];
         
