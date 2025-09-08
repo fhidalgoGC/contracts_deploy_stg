@@ -14,15 +14,13 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Navigation Bar */}
         <NavBar title={title} />
         
         {/* Content Area - Only this section will scroll */}
-        <main className="flex-1 bg-gray-100/80 dark:bg-gray-900/60 overflow-y-auto min-h-0">
-          <div className="p-4">
-            {children}
-          </div>
+        <main className="flex-1 bg-gray-100/80 dark:bg-gray-900/60 overflow-y-auto">
+          {children}
         </main>
       </div>
     </div>
