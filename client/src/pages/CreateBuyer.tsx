@@ -24,6 +24,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { CountrySelector } from '@/components/ui/country-selector-new';
 import { StateSelector } from '@/components/ui/state-selector-new';
 import { CitySelector } from '@/components/ui/city-selector-new';
+import { useToast } from '@/hooks/use-toast';
 import type { Country } from '@/features/countries/types/country';
 import type { State } from '@/features/states/types/state';
 import type { City } from '@/features/cities/hooks/useCities';
@@ -80,6 +81,8 @@ export default function CreateBuyer() {
     error,
     isSuccess,
   } = useCreateBuyer();
+
+  const { toast } = useToast();
 
   const form = useForm<BuyerFormData>({
     resolver: zodResolver(buyerSchema),
@@ -177,7 +180,7 @@ export default function CreateBuyer() {
       console.log('CreateBuyer: Submitting form with location data:', formDataWithLocation);
       await createBuyer(formDataWithLocation);
       
-      // Show success modal
+      // Only show success modal if creation was successful
       const buyerName = data.person_type === "juridical_person" 
         ? data.organization_name || `${data.first_name} ${data.last_name}`
         : `${data.first_name} ${data.last_name}`;
@@ -185,6 +188,16 @@ export default function CreateBuyer() {
       setSuccessModal({ open: true, buyerName });
     } catch (error) {
       console.error("CreateBuyer: Form submission failed:", error);
+      
+      // Show error toast instead of success modal
+      toast({
+        variant: "destructive",
+        title: t("error"),
+        description: t("buyerCreationFailed") || "Error al crear el comprador. Por favor, intenta nuevamente.",
+      });
+      
+      // Stay on the same screen - do not show success modal or navigate
+      return;
     }
   };
 

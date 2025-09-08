@@ -32,6 +32,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { CountrySelector } from "@/components/ui/country-selector-new";
 import { StateSelector } from "@/components/ui/state-selector-new";
 import { CitySelector } from "@/components/ui/city-selector-new";
+import { useToast } from "@/hooks/use-toast";
 import type { Country } from "@/features/countries/types/country";
 import type { State } from "@/features/states/types/state";
 import type { City } from "@/features/cities/hooks/useCities";
@@ -100,6 +101,8 @@ export default function CreateSeller() {
     error,
     isSuccess,
   } = useCreateSeller();
+
+  const { toast } = useToast();
 
   const form = useForm<SellerFormData>({
     resolver: zodResolver(sellerSchema),
@@ -204,7 +207,7 @@ export default function CreateSeller() {
       
       await createSeller(formDataWithLocation);
       
-      // Show success modal
+      // Only show success modal if creation was successful
       const sellerName = data.person_type === "juridical_person" 
         ? data.organization_name || `${data.first_name} ${data.last_name}`
         : `${data.first_name} ${data.last_name}`;
@@ -212,6 +215,16 @@ export default function CreateSeller() {
       setSuccessModal({ open: true, sellerName });
     } catch (error) {
       console.error("CreateSeller: Form submission failed:", error);
+      
+      // Show error toast instead of success modal
+      toast({
+        variant: "destructive",
+        title: t("error"),
+        description: t("sellerCreationFailed") || "Error al crear el vendedor. Por favor, intenta nuevamente.",
+      });
+      
+      // Stay on the same screen - do not show success modal or navigate
+      return;
     }
   };
 
