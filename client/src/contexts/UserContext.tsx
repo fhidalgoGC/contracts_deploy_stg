@@ -73,10 +73,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
         // También restaurar la organización actual si está guardada
         const currentOrgId = localStorage.getItem('current_organization_id');
         if (currentOrgId) {
-          const currentOrg = organizationData.find((org: OrganizationData) => org.id === currentOrgId);
+          // Buscar por id o partitionKey para mayor compatibilidad
+          const currentOrg = organizationData.find((org: OrganizationData) => 
+            org.id === currentOrgId || org.partitionKey === currentOrgId
+          );
           if (currentOrg) {
             setCurrentOrganization(currentOrg);
-            console.log('🎯 USER CONTEXT: Organización actual restaurada:', currentOrg.organization);
+            console.log('🎯 USER CONTEXT: Organización actual restaurada desde evento:', currentOrg.organization);
+          } else {
+            console.log('⚠️ USER CONTEXT: No se encontró la organización con ID en evento:', currentOrgId);
+            console.log('📋 Organizaciones en evento:', organizationData.map(org => ({ id: org.id, partitionKey: org.partitionKey, name: org.organization })));
           }
         }
       }
@@ -114,12 +120,28 @@ export function UserProvider({ children }: { children: ReactNode }) {
         const parsedOrgs = JSON.parse(storedAvailableOrgs);
         setAvailableOrganizations(parsedOrgs);
         console.log('🔄 USER CONTEXT: Organizaciones disponibles cargadas desde localStorage:', parsedOrgs.length);
+        
+        // También restaurar la organización actual si está guardada
+        const currentOrgId = localStorage.getItem('current_organization_id');
+        if (currentOrgId && !currentOrganization) {
+          // Buscar por id o partitionKey para mayor compatibilidad
+          const currentOrg = parsedOrgs.find((org: OrganizationData) => 
+            org.id === currentOrgId || org.partitionKey === currentOrgId
+          );
+          if (currentOrg) {
+            setCurrentOrganization(currentOrg);
+            console.log('🎯 USER CONTEXT: Organización actual restaurada desde localStorage:', currentOrg.organization);
+          } else {
+            console.log('⚠️ USER CONTEXT: No se encontró la organización con ID:', currentOrgId);
+            console.log('📋 Organizaciones disponibles:', parsedOrgs.map(org => ({ id: org.id, partitionKey: org.partitionKey, name: org.organization })));
+          }
+        }
       } catch (error) {
         console.error('Error loading available organizations from localStorage:', error);
         localStorage.removeItem('available_organizations');
       }
     }
-  }, []);
+  }, [currentOrganization]);
 
   // Clear all session data
   const clearSession = () => {
