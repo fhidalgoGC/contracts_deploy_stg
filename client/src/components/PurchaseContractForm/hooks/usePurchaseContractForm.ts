@@ -88,18 +88,81 @@ export function usePurchaseContractForm(options: UsePurchaseContractFormOptions 
       adjustments: [],
     };
     
+    // Convert API format to form format for remarks and notes
+    const convertApiDataToFormFormat = (data: any): any => {
+      const converted = { ...data };
+      
+      // Convert remarks from API format to form format
+      if (converted.remarks && Array.isArray(converted.remarks)) {
+        const convertedRemarks: string[] = [];
+        
+        converted.remarks.forEach((remark: any) => {
+          // Handle API format: { title: "contact", values: ["DATA"] }
+          if (typeof remark === 'object' && remark.title && remark.values) {
+            // Map API title back to display label
+            const titleToLabelMap: Record<string, string> = {
+              'contact': 'Contact',
+              'shipment': 'Shipment',
+              'routing': 'Routing',
+              'premDisc': 'Prem/Disc',
+              'terms': 'Terms',
+              'remarks': 'Remarks'
+            };
+            
+            const label = titleToLabelMap[remark.title] || 'Remarks';
+            
+            // Convert multiple values back to single string with line breaks
+            const content = remark.values.join('\n');
+            convertedRemarks.push(`${label}:${content}`);
+          }
+          // Handle legacy format: "Contact:DATA"
+          else if (typeof remark === 'string') {
+            convertedRemarks.push(remark);
+          }
+        });
+        
+        converted.remarks = convertedRemarks;
+      }
+      
+      // Convert notes from API format to form format (add as COMMENT: entries)
+      if (converted.notes && Array.isArray(converted.notes)) {
+        const convertedComments: string[] = [];
+        
+        converted.notes.forEach((note: any) => {
+          // Handle API format: { people_id, people_name, text, date }
+          if (typeof note === 'object' && note.text) {
+            convertedComments.push(`COMMENT:${note.text}`);
+          }
+        });
+        
+        // Add comments to remarks array
+        if (!converted.remarks) {
+          converted.remarks = [];
+        }
+        converted.remarks = [...converted.remarks, ...convertedComments];
+        
+        // Remove notes from form data since they're now in remarks
+        delete converted.notes;
+      }
+      
+      return converted;
+    };
+    
     // Deep merge initial data with defaults, giving priority to initialData
     const mergeData = (defaults: any, data: any): any => {
       const result = { ...defaults };
       
-      Object.keys(data).forEach(key => {
-        if (data[key] !== null && data[key] !== undefined) {
-          if (Array.isArray(data[key])) {
-            result[key] = data[key];
-          } else if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
-            result[key] = mergeData(result[key] || {}, data[key]);
+      // Convert API data format first
+      const convertedData = convertApiDataToFormFormat(data);
+      
+      Object.keys(convertedData).forEach(key => {
+        if (convertedData[key] !== null && convertedData[key] !== undefined) {
+          if (Array.isArray(convertedData[key])) {
+            result[key] = convertedData[key];
+          } else if (typeof convertedData[key] === 'object' && !Array.isArray(convertedData[key])) {
+            result[key] = mergeData(result[key] || {}, convertedData[key]);
           } else {
-            result[key] = data[key];
+            result[key] = convertedData[key];
           }
         }
       });
