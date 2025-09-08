@@ -167,7 +167,7 @@ export function useCreateBuyer() {
     idempotentBuyerId,
     isInitializing,
     initializationError: error,
-    createBuyer: createBuyerMutation.mutate,
+    createBuyer: createBuyerMutation.mutateAsync,
     isCreating: createBuyerMutation.isPending,
     error: createBuyerMutation.error,
     isSuccess: createBuyerMutation.isSuccess,

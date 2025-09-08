@@ -98,7 +98,7 @@ export function useCreateSeller() {
     idempotentSellerId,
     isInitializing,
     initializationError,
-    createSeller: createSellerMutation.mutate,
+    createSeller: createSellerMutation.mutateAsync,
     isCreating: createSellerMutation.isPending,
     error: createSellerMutation.error?.message,
     isSuccess: createSellerMutation.isSuccess,
