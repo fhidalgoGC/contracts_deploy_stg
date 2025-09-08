@@ -68,19 +68,6 @@ const sellerSchema = z
   )
   .refine(
     (data) => {
-      if (data.email && data.email.trim()) {
-        const validDomains = [".com", ".mx"];
-        return validDomains.some((domain) => data.email!.endsWith(domain));
-      }
-      return true;
-    },
-    {
-      message: "El email debe terminar en .com o .mx",
-      path: ["email"],
-    },
-  )
-  .refine(
-    (data) => {
       if (data.phone_number && data.phone_number.trim()) {
         return data.calling_code && data.calling_code.trim().length > 0;
       }
