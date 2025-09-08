@@ -786,8 +786,9 @@ export default function CreateSeller() {
         onOpenChange={(open) => {
           setSuccessModal((prev) => ({ ...prev, open }));
           if (!open) {
-            // Redirect to sellers list with refresh parameter when modal is closed
-            setLocation("/sellers?refresh=true");
+            // Mark for refresh and redirect to sellers list when modal is closed
+            localStorage.setItem("shouldRefreshSellers", "true");
+            setLocation("/sellers");
           }
         }}
       >
@@ -805,7 +806,8 @@ export default function CreateSeller() {
               className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
               onClick={() => {
                 setSuccessModal({ open: false, sellerName: "" });
-                setLocation("/sellers?refresh=true");
+                localStorage.setItem("shouldRefreshSellers", "true");
+                setLocation("/sellers");
               }}
             >
               {t("continue")}

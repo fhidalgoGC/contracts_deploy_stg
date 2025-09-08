@@ -22,21 +22,6 @@ export default function Buyers() {
     handleNavigateToPage('buyers');
   }, []);
   
-  // Detectar parámetro refresh y recargar datos
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldRefresh = urlParams.get("refresh") === "true";
-
-    if (shouldRefresh) {
-      console.log("🔄 Refresh parameter detected, refreshing buyers list");
-      // Limpiar el parámetro de la URL
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, "", cleanUrl);
-
-      // Disparar refresh
-      refetch();
-    }
-  }, [location, refetch]);
   const {
     data,
     isLoading,
@@ -51,6 +36,22 @@ export default function Buyers() {
     handleSortChange,
     handleSearchChange,
   } = useBuyers();
+
+  // Detectar marca de refresh y recargar datos
+  useEffect(() => {
+    const shouldRefresh = localStorage.getItem("shouldRefreshBuyers") === "true";
+
+    if (shouldRefresh) {
+      console.log("🔄 Refresh flag detected, refreshing buyers list");
+      // Limpiar la marca
+      localStorage.removeItem("shouldRefreshBuyers");
+
+      // Disparar refresh
+      if (refetch) {
+        refetch();
+      }
+    }
+  }, [location, refetch]);
 
   console.log('Buyers component render:', { data, isLoading, currentPage });
 

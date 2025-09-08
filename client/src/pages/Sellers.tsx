@@ -23,21 +23,6 @@ export default function Sellers() {
     handleNavigateToPage("sellers");
   }, []);
   
-  // Detectar parámetro refresh y recargar datos
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldRefresh = urlParams.get("refresh") === "true";
-
-    if (shouldRefresh) {
-      console.log("🔄 Refresh parameter detected, refreshing sellers list");
-      // Limpiar el parámetro de la URL
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, "", cleanUrl);
-
-      // Disparar refresh
-      refetch();
-    }
-  }, [location, refetch]);
   const {
     data,
     isLoading,
@@ -52,6 +37,22 @@ export default function Sellers() {
     handleSortChange,
     handleSearchChange,
   } = useSellers();
+
+  // Detectar marca de refresh y recargar datos
+  useEffect(() => {
+    const shouldRefresh = localStorage.getItem("shouldRefreshSellers") === "true";
+
+    if (shouldRefresh) {
+      console.log("🔄 Refresh flag detected, refreshing sellers list");
+      // Limpiar la marca
+      localStorage.removeItem("shouldRefreshSellers");
+
+      // Disparar refresh
+      if (refetch) {
+        refetch();
+      }
+    }
+  }, [location, refetch]);
 
   console.log("Sellers component render:", { data, isLoading, currentPage });
 
