@@ -746,6 +746,35 @@ export default function CreateBuyer() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Error Modal */}
+      <AlertDialog
+        open={errorModal.open}
+        onOpenChange={(open) => {
+          setErrorModal((prev) => ({ ...prev, open }));
+        }}
+      >
+        <AlertDialogContent className="border-red-500">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-700 dark:text-red-400">
+              ❌ {t("error")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-red-600 dark:text-red-300">
+              {errorModal.errorMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+              onClick={() => {
+                setErrorModal({ open: false, errorMessage: "" });
+              }}
+            >
+              {t("ok") || "OK"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
