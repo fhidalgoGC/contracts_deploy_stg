@@ -445,7 +445,66 @@ export function usePurchaseContractForm(options: UsePurchaseContractFormOptions 
       status: 'created',
       contract_date: new Date(formData.contract_date).toISOString(),
       notes: [],
-      remarks: (formData.remarks || []).filter(remark => remark.trim() !== ''),
+      remarks: (() => {
+        const processedRemarks: Array<{ title: string; values: string[] }> = [];
+        
+        // Process each remark from the form
+        (formData.remarks || [])
+          .filter(remark => remark.trim() !== '')
+          .forEach(remark => {
+            // Skip comments as they are not part of the remarks API structure
+            if (remark.startsWith('COMMENT:')) {
+              return;
+            }
+            
+            let title = '';
+            let content = '';
+            
+            // Extract title and content from "Label:content" format
+            if (remark.includes(':')) {
+              const parts = remark.split(':');
+              const label = parts[0].trim();
+              content = parts.slice(1).join(':').trim(); // Handle content with colons
+              
+              // Map display labels to API title values
+              const labelToTitleMap: Record<string, string> = {
+                'Contact': 'contact',
+                'Shipment': 'shipment', 
+                'Routing': 'routing',
+                'Prem/Disc': 'premDisc',
+                'Terms': 'terms',
+                'Remarks': 'remarks'
+              };
+              
+              title = labelToTitleMap[label] || label.toLowerCase();
+            } else {
+              // If no colon, treat the whole thing as content with default title
+              title = 'remarks';
+              content = remark.trim();
+            }
+            
+            // Skip if no content
+            if (!content) {
+              return;
+            }
+            
+            // Split content by line breaks to create multiple values
+            const values = content
+              .split('\n')
+              .map(line => line.trim())
+              .filter(line => line !== '');
+            
+            // Only add if we have values
+            if (values.length > 0) {
+              processedRemarks.push({
+                title,
+                values
+              });
+            }
+          });
+        
+        return processedRemarks;
+      })(),
       ...(formData.adjustments && formData.adjustments.length > 0 && { 
         adjustments: formData.adjustments 
       }),
