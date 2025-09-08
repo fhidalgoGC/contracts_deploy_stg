@@ -692,8 +692,8 @@ export default function CreateBuyer() {
         onOpenChange={(open) => {
           setSuccessModal((prev) => ({ ...prev, open }));
           if (!open) {
-            // Redirect to buyers list when modal is closed
-            setLocation("/buyers");
+            // Redirect to buyers list with refresh parameter when modal is closed
+            setLocation("/buyers?refresh=true");
           }
         }}
       >
@@ -711,7 +711,7 @@ export default function CreateBuyer() {
               className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
               onClick={() => {
                 setSuccessModal({ open: false, buyerName: "" });
-                setLocation("/buyers");
+                setLocation("/buyers?refresh=true");
               }}
             >
               {t("continue")}
