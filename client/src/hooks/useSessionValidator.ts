@@ -231,8 +231,9 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         'representative_people_calling_code', 'representative_people_phone_number',
         'company_business_name', 'company_business_type',
         'company_calling_code', 'company_phone_number', 'company_address_line',
-        'current_organization_id', 'current_organization_name', 'organization_details',
-        // NOTA: NO limpiamos 'available_organizations' para permitir restauración en nuevas pestañas
+        // NOTA: NO limpiamos datos de organizaciones para permitir restauración en nuevas pestañas:
+        // - 'current_organization_id', 'current_organization_name', 'organization_details' 
+        // - 'available_organizations'
         'last_activity', 'login_time'
       ];
 
