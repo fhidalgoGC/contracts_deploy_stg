@@ -19,7 +19,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
         <NavBar title={title} />
         
         {/* Content Area - Only this section will scroll */}
-        <main className="flex-1 bg-gray-100/80 dark:bg-gray-900/60 overflow-y-auto p-4 pb-8">
+        <main className="flex-1 bg-gray-100/80 dark:bg-gray-900/60 overflow-y-auto p-4" style={{ paddingBottom: '50px' }}>
           {children}
         </main>
       </div>
