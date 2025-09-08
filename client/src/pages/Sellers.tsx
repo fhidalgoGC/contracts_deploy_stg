@@ -93,7 +93,7 @@ export default function Sellers() {
 
   return (
     <DashboardLayout title={t("sellers")}>
-      <div className="p-6">
+      <div>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
             {t("sellers")}

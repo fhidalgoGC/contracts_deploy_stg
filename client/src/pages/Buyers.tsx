@@ -89,7 +89,7 @@ export default function Buyers() {
 
   return (
     <DashboardLayout title={t('buyers')}>
-      <div className="p-6">
+      <div>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
             {t('buyers')}

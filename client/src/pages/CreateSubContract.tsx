@@ -447,7 +447,7 @@ export default function CreateSubContract() {
 
   return (
     <DashboardLayout title="Crear Sub-Contrato">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         
 
 
