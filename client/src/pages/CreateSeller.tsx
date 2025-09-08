@@ -341,7 +341,7 @@ export default function CreateSeller() {
                       />
                       <Label
                         htmlFor="natural_person"
-                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-green-600 peer-checked:border-4 peer-checked:bg-green-100 dark:peer-checked:bg-green-900/40 peer-checked:shadow-lg peer-checked:scale-[1.02] transition-all duration-200"
+                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-blue-600 peer-checked:border-4 peer-checked:bg-blue-100 dark:peer-checked:bg-blue-900/50 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-blue-500 peer-checked:ring-offset-2 transition-all duration-200"
                       >
                         <User className="w-6 h-6 text-gray-600 dark:text-gray-400 mb-2" />
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -360,7 +360,7 @@ export default function CreateSeller() {
                       />
                       <Label
                         htmlFor="juridical_person"
-                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-green-600 peer-checked:border-4 peer-checked:bg-green-100 dark:peer-checked:bg-green-900/40 peer-checked:shadow-lg peer-checked:scale-[1.02] transition-all duration-200"
+                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-blue-600 peer-checked:border-4 peer-checked:bg-blue-100 dark:peer-checked:bg-blue-900/50 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-blue-500 peer-checked:ring-offset-2 transition-all duration-200"
                       >
                         <Building2 className="w-6 h-6 text-gray-600 dark:text-gray-400 mb-2" />
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
