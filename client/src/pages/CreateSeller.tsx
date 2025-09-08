@@ -341,13 +341,29 @@ export default function CreateSeller() {
                       />
                       <Label
                         htmlFor="natural_person"
-                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-blue-600 peer-checked:border-4 peer-checked:bg-blue-600 peer-checked:text-white dark:peer-checked:bg-blue-700 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-blue-500 peer-checked:ring-offset-2 transition-all duration-200"
+                        className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                          personType === 'natural_person' 
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                        }`}
                       >
-                        <User className="w-6 h-6 text-gray-600 dark:text-gray-400 peer-checked:text-white mb-2" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <User className={`w-6 h-6 mb-2 ${
+                          personType === 'natural_person' 
+                            ? 'text-white' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`} />
+                        <span className={`text-sm font-medium ${
+                          personType === 'natural_person' 
+                            ? 'text-white' 
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
                           {t("naturalPerson")}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                        <span className={`text-xs mt-1 text-center ${
+                          personType === 'natural_person' 
+                            ? 'text-blue-100' 
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
                           {t("naturalPersonDesc")}
                         </span>
                       </Label>
@@ -360,13 +376,29 @@ export default function CreateSeller() {
                       />
                       <Label
                         htmlFor="juridical_person"
-                        className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 peer-checked:border-blue-600 peer-checked:border-4 peer-checked:bg-blue-600 peer-checked:text-white dark:peer-checked:bg-blue-700 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-blue-500 peer-checked:ring-offset-2 transition-all duration-200"
+                        className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                          personType === 'juridical_person' 
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
+                        }`}
                       >
-                        <Building2 className="w-6 h-6 text-gray-600 dark:text-gray-400 peer-checked:text-white mb-2" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <Building2 className={`w-6 h-6 mb-2 ${
+                          personType === 'juridical_person' 
+                            ? 'text-white' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`} />
+                        <span className={`text-sm font-medium ${
+                          personType === 'juridical_person' 
+                            ? 'text-white' 
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
                           {t("juridicalPerson")}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                        <span className={`text-xs mt-1 text-center ${
+                          personType === 'juridical_person' 
+                            ? 'text-blue-100' 
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
                           {t("juridicalPersonDesc")}
                         </span>
                       </Label>
