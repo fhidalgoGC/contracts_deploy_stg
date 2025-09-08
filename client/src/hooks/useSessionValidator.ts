@@ -232,7 +232,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         'company_business_name', 'company_business_type',
         'company_calling_code', 'company_phone_number', 'company_address_line',
         'current_organization_id', 'current_organization_name', 'organization_details',
-        'available_organizations', // ← Nuevo: limpiar organizaciones disponibles
+        // NOTA: NO limpiamos 'available_organizations' para permitir restauración en nuevas pestañas
         'last_activity', 'login_time'
       ];
 
