@@ -65,6 +65,7 @@ export default function CreateBuyer() {
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
   const [successModal, setSuccessModal] = useState({ open: false, buyerName: "" });
+  const [errorModal, setErrorModal] = useState({ open: false, errorMessage: "" });
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [selectedState, setSelectedState] = useState<State | null>(null);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
@@ -189,12 +190,23 @@ export default function CreateBuyer() {
     } catch (error) {
       console.error("CreateBuyer: Form submission failed:", error);
       
-      // Show error toast instead of success modal
-      toast({
-        variant: "destructive",
-        title: t("error"),
-        description: t("buyerCreationFailed") || "Error al crear el comprador. Por favor, intenta nuevamente.",
-      });
+      // Extract error message from API response
+      let errorMessage = t("buyerCreationFailed") || "Error al crear el comprador. Por favor, intenta nuevamente.";
+      
+      if (error && typeof error === 'object') {
+        // Try to extract specific error message from API response
+        const apiError = error as any;
+        if (apiError.response?.data?.detail?.message) {
+          errorMessage = apiError.response.data.detail.message;
+        } else if (apiError.response?.data?.message) {
+          errorMessage = apiError.response.data.message;
+        } else if (apiError.message) {
+          errorMessage = apiError.message;
+        }
+      }
+      
+      // Show error modal instead of success modal
+      setErrorModal({ open: true, errorMessage });
       
       // Stay on the same screen - do not show success modal or navigate
       return;
