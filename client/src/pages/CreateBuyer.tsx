@@ -307,7 +307,7 @@ export default function CreateBuyer() {
                         htmlFor="natural_person" 
                         className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                           personType === 'natural_person' 
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            ? 'bg-blue-500 border-blue-500 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
                             : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                         }`}
                       >
@@ -342,7 +342,7 @@ export default function CreateBuyer() {
                         htmlFor="juridical_person" 
                         className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                           personType === 'juridical_person' 
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            ? 'bg-blue-500 border-blue-500 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
                             : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                         }`}
                       >
