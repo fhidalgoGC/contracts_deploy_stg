@@ -9,12 +9,12 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
   return (
-    <div className="h-screen flex bg-gradient-to-br from-gray-200 via-gray-200 to-gray-300/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/50">
+    <div className="h-screen flex bg-gradient-to-br from-gray-200 via-gray-200 to-gray-300/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/50 overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Navigation Bar */}
         <NavBar title={title} />
         
