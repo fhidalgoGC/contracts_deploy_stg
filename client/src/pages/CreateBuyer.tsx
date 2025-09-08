@@ -307,25 +307,25 @@ export default function CreateBuyer() {
                         htmlFor="natural_person" 
                         className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                           personType === 'natural_person' 
-                            ? 'bg-blue-500 border-blue-500 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
                             : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                         }`}
                       >
                         <User className={`w-6 h-6 mb-2 ${
                           personType === 'natural_person' 
-                            ? 'text-white' 
+                            ? 'text-blue-700 dark:text-blue-300' 
                             : 'text-gray-600 dark:text-gray-400'
                         }`} />
                         <span className={`text-sm font-medium ${
                           personType === 'natural_person' 
-                            ? 'text-white' 
+                            ? 'text-blue-700 dark:text-blue-300' 
                             : 'text-gray-900 dark:text-white'
                         }`}>
                           {t('naturalPerson')}
                         </span>
                         <span className={`text-xs mt-1 text-center ${
                           personType === 'natural_person' 
-                            ? 'text-blue-100' 
+                            ? 'text-blue-600 dark:text-blue-400' 
                             : 'text-gray-500 dark:text-gray-400'
                         }`}>
                           {t('naturalPersonDesc')}
@@ -342,25 +342,25 @@ export default function CreateBuyer() {
                         htmlFor="juridical_person" 
                         className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                           personType === 'juridical_person' 
-                            ? 'bg-blue-500 border-blue-500 text-white shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
+                            ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 shadow-xl ring-2 ring-blue-500 ring-offset-2 border-4' 
                             : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
                         }`}
                       >
                         <Building2 className={`w-6 h-6 mb-2 ${
                           personType === 'juridical_person' 
-                            ? 'text-white' 
+                            ? 'text-blue-700 dark:text-blue-300' 
                             : 'text-gray-600 dark:text-gray-400'
                         }`} />
                         <span className={`text-sm font-medium ${
                           personType === 'juridical_person' 
-                            ? 'text-white' 
+                            ? 'text-blue-700 dark:text-blue-300' 
                             : 'text-gray-900 dark:text-white'
                         }`}>
                           {t('juridicalPerson')}
                         </span>
                         <span className={`text-xs mt-1 text-center ${
                           personType === 'juridical_person' 
-                            ? 'text-blue-100' 
+                            ? 'text-blue-600 dark:text-blue-400' 
                             : 'text-gray-500 dark:text-gray-400'
                         }`}>
                           {t('juridicalPersonDesc')}
