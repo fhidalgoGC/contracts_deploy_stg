@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {  usePageTracking, useNavigationHandler } from '@/hooks/usePageState';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { DataTable, Column } from '@/components/ui/data-table';
@@ -11,7 +11,7 @@ import { formatBuyerId } from '@/lib/formatters';
 
 export default function Buyers() {
   const { t } = useTranslation();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { handleNavigateToPage } = useNavigationHandler();
   
   usePageTracking('/buyers');
@@ -21,6 +21,22 @@ export default function Buyers() {
     console.log('🔄 BUYERS PAGE: Cargando página y ejecutando navegación jerárquica');
     handleNavigateToPage('buyers');
   }, []);
+  
+  // Detectar parámetro refresh y recargar datos
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldRefresh = urlParams.get("refresh") === "true";
+
+    if (shouldRefresh) {
+      console.log("🔄 Refresh parameter detected, refreshing buyers list");
+      // Limpiar el parámetro de la URL
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, "", cleanUrl);
+
+      // Disparar refresh
+      refetch();
+    }
+  }, [location, refetch]);
   const {
     data,
     isLoading,
@@ -29,6 +45,7 @@ export default function Buyers() {
     sortKey,
     sortDirection,
     searchValue,
+    refetch,
     handlePageChange,
     handlePageSizeChange,
     handleSortChange,
