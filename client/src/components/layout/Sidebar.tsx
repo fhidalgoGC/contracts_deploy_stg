@@ -45,7 +45,7 @@ export default function Sidebar() {
   const { handleNavigateToPage } = useNavigationHandler();
 
   return (
-    <div className="w-64 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-r border-gray-200/60 dark:border-gray-700/60 h-screen">
+    <div className="w-64 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-r border-gray-200/60 dark:border-gray-700/60 h-full">
       <div className="px-4 py-6">
         <div className="mb-8 flex justify-center">
           <img 
