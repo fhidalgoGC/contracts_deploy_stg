@@ -27,6 +27,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
   const [sellers, setSellers] = useState<CrmPerson[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -65,6 +66,8 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
     }
     
     if (trimmedSearch.length >= 2) {
+      // Show search loading immediately
+      setSearchLoading(true);
       // Set new timeout for 200ms
       searchTimeoutRef.current = setTimeout(() => {
         console.log('🔍 Debounced search triggered for:', trimmedSearch);
@@ -128,6 +131,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
     } finally {
       setLoading(false);
       setLoadingMore(false);
+      setSearchLoading(false);
     }
   };
 
@@ -218,8 +222,14 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
                 placeholder={contractType === "sale" ? t('searchBuyers') : t('searchSellers')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 pr-10"
               />
+              {/* Search loading indicator */}
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                </div>
+              )}
             </div>
 
             {/* Loading */}
@@ -233,7 +243,18 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
 
             {/* Results */}
             {!loading && (
-              <div className="flex-1 min-h-0 overflow-y-auto pr-2" onScroll={handleScroll}>
+              <div className="relative flex-1 min-h-0 overflow-y-auto pr-2" onScroll={handleScroll}>
+                {/* Search loading overlay */}
+                {searchLoading && (
+                  <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center z-10">
+                    <div className="flex flex-col items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        {contractType === "sale" ? "Buscando compradores..." : "Buscando vendedores..."}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {filteredSellers.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
