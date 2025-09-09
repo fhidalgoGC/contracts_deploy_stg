@@ -160,10 +160,10 @@ export function ContractInfoSection({
     setValue,
   ]);
 
-  // Extract subcategory_id from commodity data
-  // Since subcategory is not available in current commodity data structure,
-  // we'll try with a default or empty string for now
-  const subcategoryId = selectedCommodityId || "";
+  // Extract subcategory_id from commodity data (original_name_id.subcategory._id)
+  // The commodities hook stores the raw data in the 'data' property
+  const subcategoryId =
+    selectedCommodity?.data?.original_name_id?.subcategory?._id;
 
   const {
     data: characteristicsConfigurations = [],

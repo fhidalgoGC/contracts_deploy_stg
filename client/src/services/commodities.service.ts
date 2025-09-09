@@ -8,10 +8,15 @@ export interface CommodityData {
   active: boolean;
   _partitionKey: string;
   original_name_id?: {
+    _id?: string;
     names?: {
       es?: string;
       en?: string;
       default?: string;
+    };
+    subcategory?: {
+      _id: string;
+      name: string;
     };
   };
 }
@@ -37,6 +42,16 @@ export interface FetchCommoditiesParams {
 export interface CharacteristicsConfigurationData {
   _id: string;
   name: string;
+  commodity_id?: string;
+  subcategory_id?: string;
+  commodity?: {
+    _id: string;
+    name: string;
+  };
+  subcategory?: {
+    _id: string;
+    name: string;
+  };
 }
 
 export interface CharacteristicsConfigurationResponse {
