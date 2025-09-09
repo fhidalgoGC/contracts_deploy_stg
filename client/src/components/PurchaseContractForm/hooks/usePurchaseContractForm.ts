@@ -488,7 +488,7 @@ export function usePurchaseContractForm(options: UsePurchaseContractFormOptions 
         payment_currency: findCurrencyValue(ls.payment_currency)
       })),
       quantity: quantity,
-      reference_number: formData.reference_number,
+      reference_number: formData.reference_number || "NA",
       measurement_unit_id: formData.measurement_unit_id, // Use the ID from form selection
       measurement_unit: formData.measurement_unit,
       shipping_start_date: new Date(formData.shipping_start_date).toISOString(),
