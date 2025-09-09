@@ -8,20 +8,17 @@ export default function DashboardLayout({
   title,
 }: DashboardLayoutProps) {
   return (
-    <div className="dashboard-layout h-screen flex bg-gradient-to-br from-gray-200 via-gray-200 to-gray-300/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/50 overflow-hidden">
+    <div className="dashboard-layout">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="dashboard-layout__main-content">
         {/* Navigation Bar */}
         <NavBar title={title} />
 
         {/* Content Area - Only this section will scroll */}
-        <main
-          className="flex-1 bg-gray-100/80 dark:bg-gray-900/60 overflow-y-auto p-4"
-          style={{ paddingBottom: "100px" }}
-        >
+        <main className="dashboard-layout__content-area">
           {children}
         </main>
       </div>
