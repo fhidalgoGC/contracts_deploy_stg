@@ -1,28 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getSellers, getBuyers, getContactVendors, getTraders, type CrmPerson } from '@/services/crm-people.service';
 import { User, Building2, Search, Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { type CrmPerson } from '@/services/crm-people.service';
+import { PersonSelectionModalProps } from './PersonSelectionModal.types';
+import { usePersonSelection } from './PersonSelectionModal.hooks';
+import { getDefaultTexts, getDisplayName, getOrganizationName, getPrimaryEmail, getPersonType } from './PersonSelectionModal.utils';
 
-export type PersonType = 'sellers' | 'buyers' | 'contactVendors' | 'traders';
-
-interface PersonSelectionModalProps {
-  onSelect: (person: { id: string; name: string; [key: string]: any }) => void;
-  selectedPersonId?: string;
-  selectedPersonName?: string;
-  personType: PersonType;
-  error?: boolean;
-  triggerButtonText?: string;
-  modalTitle?: string;
-  searchPlaceholder?: string;
-  noDataMessage?: string;
-  contractType?: "purchase" | "sale";
-}
-
-export const PersonSelectionModal: React.FC<PersonSelectionModalProps> = ({
+export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
   onSelect,
   selectedPersonId,
   selectedPersonName,
@@ -34,190 +21,23 @@ export const PersonSelectionModal: React.FC<PersonSelectionModalProps> = ({
   noDataMessage,
   contractType = "purchase"
 }) => {
-  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [people, setPeople] = useState<CrmPerson[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-
-  // Service mapping
-  const getServiceFunction = () => {
-    switch (personType) {
-      case 'sellers':
-        return getSellers;
-      case 'buyers':
-        return getBuyers;
-      case 'contactVendors':
-        return getContactVendors;
-      case 'traders':
-        return getTraders;
-      default:
-        return getSellers;
-    }
-  };
-
-  // Default text configurations
-  const getDefaultTexts = () => {
-    switch (personType) {
-      case 'sellers':
-        return {
-          triggerText: contractType === "sale" ? t('selectBuyer') : t('selectSeller'),
-          modalTitle: contractType === "sale" ? t('selectBuyer') : t('selectSeller'),
-          searchPlaceholder: contractType === "sale" ? t('searchBuyers') : t('searchSellers'),
-          noDataMessage: contractType === "sale" ? t('noBuyersFound') : t('noSellersFound'),
-          loadingMessage: contractType === "sale" ? "Cargando compradores..." : "Cargando vendedores...",
-          searchingMessage: contractType === "sale" ? "Buscando compradores..." : "Buscando vendedores...",
-        };
-      case 'buyers':
-        return {
-          triggerText: t('selectBuyer'),
-          modalTitle: t('selectBuyer'),
-          searchPlaceholder: t('searchBuyers'),
-          noDataMessage: t('noBuyersFound'),
-          loadingMessage: "Cargando compradores...",
-          searchingMessage: "Buscando compradores...",
-        };
-      case 'contactVendors':
-        return {
-          triggerText: t('selectContactVendor'),
-          modalTitle: t('selectContactVendor'),
-          searchPlaceholder: t('searchContactVendors'),
-          noDataMessage: t('noContactVendorsFound'),
-          loadingMessage: "Cargando contacto vendedores...",
-          searchingMessage: "Buscando contacto vendedores...",
-        };
-      case 'traders':
-        return {
-          triggerText: t('selectTrader'),
-          modalTitle: t('selectTrader'),
-          searchPlaceholder: t('searchTraders'),
-          noDataMessage: t('noTradersFound'),
-          loadingMessage: "Cargando traders...",
-          searchingMessage: "Buscando traders...",
-        };
-      default:
-        return {
-          triggerText: 'Seleccionar',
-          modalTitle: 'Seleccionar',
-          searchPlaceholder: 'Buscar...',
-          noDataMessage: 'No se encontraron datos',
-          loadingMessage: "Cargando...",
-          searchingMessage: "Buscando...",
-        };
-    }
-  };
-
-  const defaultTexts = getDefaultTexts();
-
-  // Load people when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      console.log(`🔄 PersonModal: Modal opened for ${personType}, loading fresh data...`);
-      setLoading(true);
-      setPeople([]);
-      setCurrentPage(1);
-      setHasMore(true);
-      setSearchTerm('');
-      setLoadingMore(false);
-      setSearchLoading(false);
-      
-      loadPeople(1, true);
-    } else {
-      setPeople([]);
-      setLoading(false);
-      setLoadingMore(false);
-      setSearchLoading(false);
-    }
-  }, [isOpen]);
-
-  // Debounce search with 200ms delay
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  useEffect(() => {
-    const trimmedSearch = searchTerm.trim();
-    
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    
-    if (trimmedSearch.length >= 2) {
-      setSearchLoading(true);
-      searchTimeoutRef.current = setTimeout(() => {
-        console.log(`🔍 Debounced search triggered for ${personType}:`, trimmedSearch);
-        setCurrentPage(1);
-        setHasMore(true);
-        loadPeople(1, true);
-      }, 200);
-    } else if (trimmedSearch.length === 0) {
-      setCurrentPage(1);
-      setHasMore(true);
-      loadPeople(1, true);
-    }
-    
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [searchTerm]);
+  const { people, loading, loadingMore, searchLoading, hasMore, handleLoadMore } = usePersonSelection(
+    personType, 
+    isOpen, 
+    searchTerm
+  );
 
-  const loadPeople = async (page: number = 1, reset: boolean = false) => {
-    try {
-      console.log(`🚀 PersonModal: Loading ${personType} - Page ${page}, Reset: ${reset}`);
-      
-      if (!reset) {
-        setLoadingMore(true);
-      }
-
-      const searchOptions = {
-        page, 
-        limit: 5,
-        ...(searchTerm.trim().length >= 2 && { search: searchTerm.trim() })
-      };
-
-      // Add sort for traders
-      if (personType === 'traders') {
-        (searchOptions as any).sort = { full_name: '1' };
-      }
-
-      const serviceFunction = getServiceFunction();
-      const response = await serviceFunction(searchOptions);
-      
-      console.log(`✅ PersonModal: Loaded ${response.data.length} ${personType}`);
-      console.log(`📊 PersonModal: Pagination - Page ${response._meta.page_number}/${response._meta.total_pages}, Total: ${response._meta.total_elements}`);
-      
-      if (reset) {
-        setPeople(response.data);
-      } else {
-        setPeople(prev => [...prev, ...response.data]);
-      }
-      
-      setHasMore(response._meta.page_number < response._meta.total_pages);
-      setCurrentPage(response._meta.page_number);
-      
-    } catch (error) {
-      console.error(`❌ PersonModal: Error fetching ${personType}:`, error);
-      if (reset) {
-        setPeople([]);
-      }
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-      setSearchLoading(false);
-    }
-  };
+  const defaultTexts = getDefaultTexts(personType, contractType);
 
   // Infinite scroll handler
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     
-    if (scrollHeight - scrollTop === clientHeight && hasMore && !loadingMore && !loading && !searchLoading) {
-      loadPeople(currentPage + 1, false);
+    if (scrollHeight - scrollTop === clientHeight) {
+      handleLoadMore();
     }
   };
 
@@ -235,26 +55,6 @@ export const PersonSelectionModal: React.FC<PersonSelectionModalProps> = ({
     setIsOpen(false);
     setSearchTerm('');
     console.log(`${personType} selected:`, personData);
-  };
-
-  const getDisplayName = (person: CrmPerson) => {
-    return person.full_name || person.name || 'Sin nombre';
-  };
-
-  const getOrganizationName = (person: CrmPerson) => {
-    return person.organization_name || person.company_name || '';
-  };
-
-  const getPrimaryEmail = (person: CrmPerson) => {
-    if (person.emails?.length) {
-      const principalEmail = person.emails.find(e => e.type === 'principal');
-      return principalEmail?.value || person.emails[0].value;
-    }
-    return person.email || '';
-  };
-
-  const getPersonType = (person: CrmPerson) => {
-    return person.person_type || 'natural_person';
   };
 
   return (
