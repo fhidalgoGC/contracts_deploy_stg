@@ -1,7 +1,9 @@
-import { MeasurementUnit, MeasurementUnitOption } from '@/types/measurementUnit.types';
 import { environment } from '@/environment/environment';
 import { authenticatedFetch } from '@/utils/apiInterceptors';
 import i18n from '@/common/utils/i18n';
+import { MeasurementUnit, MeasurementUnitOption } from './types';
+
+export type { MeasurementUnit, MeasurementUnitOption };
 
 export class MeasurementUnitsService {
   private static buildUrl(): string {

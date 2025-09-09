@@ -1,21 +1,8 @@
 import { authenticatedFetch } from "@/utils/apiInterceptors";
 import { environment } from "@/environment/environment";
+import { Organization, OrganizationOption } from "./types";
 
-export interface Organization {
-  _id: string;
-  name: string;
-  description?: string;
-  type?: string;
-  logo?: string;
-  initials?: string;
-}
-
-export interface OrganizationOption {
-  key: string;
-  value: string;
-  label: string;
-  organization: Organization;
-}
+export type { Organization, OrganizationOption };
 
 // Organization service with customer info and partition keys
 export const organizationService = {
