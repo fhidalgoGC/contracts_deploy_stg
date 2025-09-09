@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/datepicker";
-import { SellerSelectionModal } from "../modals/SellerSelectionModal";
+import { SellerSelectionModal } from "../../general/listInModal/SellerSelectionModal";
 import { ContactVendorSelectionModal } from "../modals/ContactVendorSelectionModal";
 import { TraderSelectionModal } from "../modals/TraderSelectionModal";
 import type { PurchaseContractFormData } from "@/validation/purchaseContract.schema";
