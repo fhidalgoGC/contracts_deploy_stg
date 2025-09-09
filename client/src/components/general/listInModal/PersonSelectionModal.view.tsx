@@ -9,6 +9,7 @@ import { PersonSelectionModalProps } from './PersonSelectionModal.types';
 import { usePersonSelection } from './PersonSelectionModal.hooks';
 import { useTranslation } from 'react-i18next';
 import { getDefaultTexts, getDisplayName, getOrganizationName, getPrimaryEmail, getPersonType } from './PersonSelectionModal.utils';
+import './PersonSelectionModal.css';
 
 export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
   onSelect,
@@ -64,9 +65,9 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
-          className={`w-full justify-start text-left font-normal ${
-            error ? 'border-red-500 bg-red-50 dark:bg-red-950/10' : ''
-          } ${selectedPersonName ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`person-selection-trigger ${
+            error ? 'error' : ''
+          } ${selectedPersonName ? 'selected' : 'placeholder'}`}
           data-testid={`button-select-${personType}`}
         >
           <User className="mr-2 h-4 w-4" />
@@ -82,7 +83,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl w-full max-w-4xl h-[80vh] max-h-[80vh] flex flex-col p-6">
+      <DialogContent className="person-selection-dialog">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <User className="h-5 w-5" />
@@ -90,7 +91,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
+        <div className="person-selection-container">
           {/* Search Input */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -98,7 +99,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
               placeholder={searchPlaceholder || defaultTexts.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-10"
+              className="person-selection-search"
               data-testid={`input-search-${personType}`}
             />
             {/* Search loading indicator */}
@@ -111,53 +112,53 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
 
           {/* Loading */}
           {loading && (
-            <div className="flex-1 flex flex-col items-center justify-center min-h-0">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-lg font-medium">{defaultTexts.loadingMessage}</p>
-              <p className="mt-2 text-sm text-gray-500">{t('loadingData')}</p>
+            <div className="person-selection-loading">
+              <div className="person-selection-loading-spinner"></div>
+              <p className="person-selection-loading-text">{defaultTexts.loadingMessage}</p>
+              <p className="person-selection-loading-subtext">{t('loadingData')}</p>
             </div>
           )}
 
           {/* Results */}
           {!loading && (
-            <div className="relative flex-1 min-h-0 overflow-y-auto pr-2" onScroll={handleScroll}>
+            <div className="person-selection-results" onScroll={handleScroll}>
               {/* Search loading overlay */}
               {searchLoading && (
-                <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center z-10">
-                  <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="person-selection-search-overlay">
+                  <div className="person-selection-search-loading">
+                    <div className="person-selection-search-spinner"></div>
+                    <p className="person-selection-search-text">
                       {defaultTexts.searchingMessage}
                     </p>
                   </div>
                 </div>
               )}
               {people.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <div className="person-selection-empty">
+                  <User className="person-selection-empty-icon" />
                   <p>{noDataMessage || defaultTexts.noDataMessage}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="person-selection-grid">
                   {people.map((person, index) => (
                     <div
                       key={`${person._id || person.id}-${index}`}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800 dark:border-gray-700"
+                      className="person-selection-card"
                       onClick={() => handleSelectPerson(person)}
                       data-testid={`card-${personType}-${person._id || person.id}`}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                      <div className="person-selection-card-content">
+                        <div className="person-selection-avatar">
                           {getPersonType(person) === 'juridical_person' ? (
-                            <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            <Building2 className="person-selection-avatar-icon" />
                           ) : (
-                            <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            <User className="person-selection-avatar-icon" />
                           )}
                         </div>
                         
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <div className="person-selection-info">
+                          <div className="person-selection-header">
+                            <h3 className="person-selection-name">
                               {getDisplayName(person, t)}
                             </h3>
                             <Badge variant={getPersonType(person) === 'juridical_person' ? 'default' : 'secondary'}>
@@ -166,14 +167,14 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
                           </div>
                           
                           {getOrganizationName(person) && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 truncate">
+                            <p className="person-selection-organization">
                               <Building2 className="inline h-3 w-3 mr-1" />
                               {getOrganizationName(person)}
                             </p>
                           )}
                           
                           {getPrimaryEmail(person) && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                            <p className="person-selection-email">
                               <Mail className="inline h-3 w-3 mr-1" />
                               {getPrimaryEmail(person)}
                             </p>
@@ -187,9 +188,9 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
 
               {/* Load More Indicator */}
               {loadingMore && (
-                <div className="flex justify-center items-center py-4">
-                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                  <span className="ml-2 text-sm text-gray-500">{t('loadingMore')}</span>
+                <div className="person-selection-load-more">
+                  <div className="person-selection-load-more-spinner"></div>
+                  <span className="person-selection-load-more-text">{t('loadingMore')}</span>
                 </div>
               )}
             </div>
