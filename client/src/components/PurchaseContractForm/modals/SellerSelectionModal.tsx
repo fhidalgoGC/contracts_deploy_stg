@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -53,20 +53,38 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
     }
   }, [isOpen]);
 
-  // Reset search - only search when 2+ characters
+  // Debounce search with 200ms delay
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   useEffect(() => {
     const trimmedSearch = searchTerm.trim();
+    
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     if (trimmedSearch.length >= 2) {
-      // When searching, reset pagination and load first page
-      setCurrentPage(1);
-      setHasMore(true);
-      loadSellers(1, true);
+      // Set new timeout for 200ms
+      searchTimeoutRef.current = setTimeout(() => {
+        console.log('🔍 Debounced search triggered for:', trimmedSearch);
+        setCurrentPage(1);
+        setHasMore(true);
+        loadSellers(1, true);
+      }, 200);
     } else if (trimmedSearch.length === 0) {
-      // When search is cleared, reload without search
+      // Immediate reload when search is cleared
       setCurrentPage(1);
       setHasMore(true);
       loadSellers(1, true);
     }
+    
+    // Cleanup function to clear timeout
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, [searchTerm]);
 
   const loadSellers = async (page: number = 1, reset: boolean = false) => {
