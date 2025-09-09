@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MoreHorizontal, Plus, Trash2, Edit, Eye } from 'lucide-react';
@@ -10,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import './StandardTable.css';
 
 // Definición de tipos genéricos
 export interface TableColumn<T = any> {
@@ -266,13 +268,13 @@ export function GenericTable<T = any>({
         switch (key) {
           case 'delete':
           case 'eliminar':
-            return <Trash2 className="w-4 h-4" />;
+            return <Trash2 className="standard-table-delete-icon" />;
           case 'edit':
           case 'editar':
-            return <Edit className="w-4 h-4" />;
+            return <Edit className="standard-table-edit-icon" />;
           case 'view':
           case 'ver':
-            return <Eye className="w-4 h-4" />;
+            return <Eye className="standard-table-view-icon" />;
           default:
             return null;
         }
@@ -292,7 +294,7 @@ export function GenericTable<T = any>({
         key: 'actions',
         title: t(actionColumnTitleKey || 'actions'),
         render: (item: T) => (
-          <div className="flex items-center gap-1">
+          <div className="standard-table-actions">
             {/* Iconos individuales */}
             {showActionIcons && iconActions.map((menuItem) => {
               const icon = menuItem.icon || getDefaultIcon(menuItem.key);
@@ -301,7 +303,7 @@ export function GenericTable<T = any>({
                   key={`icon-${menuItem.key}`}
                   variant="ghost"
                   size="sm"
-                  className={`h-8 w-8 p-0 ${menuItem.className || ''}`}
+                  className={`standard-table-action-icon ${menuItem.className || ''}`}
                   onClick={() => menuItem.action(item)}
                   title={t(menuItem.labelKey)} // Tooltip con el nombre de la acción
                 >
@@ -314,8 +316,8 @@ export function GenericTable<T = any>({
             {menuActions.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="w-4 h-4" />
+                  <Button variant="ghost" size="sm" className="standard-table-action-menu-trigger">
+                    <MoreHorizontal className="standard-table-action-menu-icon" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -438,17 +440,17 @@ export function GenericTable<T = any>({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="standard-table-container">
       {/* Header with Add Button */}
       {(title || titleKey || showCreateButton) && (
-        <div className="flex justify-between items-center">
+        <div className="standard-table-header">
           {(title || titleKey) && (
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="standard-table-title">
                 {title || (titleKey && t(titleKey))}
               </h1>
               {(description || descriptionKey) && (
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="standard-table-description">
                   {description || (descriptionKey && t(descriptionKey))}
                 </p>
               )}
@@ -458,10 +460,10 @@ export function GenericTable<T = any>({
           {showCreateButton && createButtonHref && (
             <Link href={createButtonHref}>
               <Button 
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                className="standard-table-create-button"
                 size="lg"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="standard-table-create-icon" />
                 {t(createButtonLabelKey)}
               </Button>
             </Link>
@@ -471,9 +473,9 @@ export function GenericTable<T = any>({
 
       {/* Filtros - DESHABILITADOS porque ahora están en el componente padre */}
       {false && showFilters && filters.length > 0 && (
-        <div className="flex flex-wrap gap-6 mb-6">
+        <div className="standard-table-filters">
           {filters.map((filter) => (
-            <div key={filter.key} className="flex flex-wrap gap-2">
+            <div key={filter.key} className="standard-table-filter-group">
               {filter.type === 'button' && filter.availableValues?.map((value) => {
                 // Manejar tanto strings como FilterOption objects
                 const isObject = typeof value === 'object' && value !== null;
@@ -486,41 +488,31 @@ export function GenericTable<T = any>({
                 const filterValue = isObject ? (value as FilterOption).value : value as string;
                 const uniqueKey = isObject ? (value as FilterOption).key : value as string;
                 
-                // Definir colores específicos para pricing type
+                // Definir clases CSS específicas para pricing type
                 const getButtonStyles = () => {
+                  const isActive = selectedFilters[filter.key]?.includes(filterValue);
+                  
                   if (filter.key === 'pricingType') {
                     if (filterValue === 'all') {
-                      return selectedFilters[filter.key]?.includes(filterValue)
-                        ? 'bg-gradient-to-r from-purple-200 to-blue-200 dark:from-purple-800/60 dark:to-blue-800/60 border-purple-400 dark:border-purple-500 text-purple-800 dark:text-purple-200 hover:from-purple-300 hover:to-blue-300 dark:hover:from-purple-900/70 dark:hover:to-blue-900/70 hover:border-purple-500 dark:hover:border-purple-400'
-                        : 'bg-white dark:bg-gray-800 border-purple-300 dark:border-purple-500 text-purple-700 dark:text-purple-300 hover:bg-purple-100 hover:border-purple-400 hover:text-purple-800 dark:hover:bg-purple-900/40 dark:hover:border-purple-400 dark:hover:text-purple-200';
+                      return isActive ? 'filter-pricing-all-active' : 'filter-pricing-all-inactive';
                     } else if (filterValue === 'basis') {
-                      return selectedFilters[filter.key]?.includes(filterValue)
-                        ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 hover:text-purple-800 dark:hover:text-purple-200 hover:border-purple-400'
-                        : 'bg-white dark:bg-gray-800 border-purple-300 dark:border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-100 hover:border-purple-400 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:border-purple-400 dark:hover:text-purple-300';
+                      return isActive ? 'filter-pricing-basis-active' : 'filter-pricing-basis-inactive';
                     } else if (filterValue === 'fixed') {
-                      return selectedFilters[filter.key]?.includes(filterValue)
-                        ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 hover:text-blue-800 dark:hover:text-blue-200 hover:border-blue-400'
-                        : 'bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:border-blue-400 dark:hover:text-blue-300';
+                      return isActive ? 'filter-pricing-fixed-active' : 'filter-pricing-fixed-inactive';
                     }
                   }
                   
-                  // Estilos específicos para commodity con botón "All" especial
+                  // Estilos específicos para commodity
                   if (filter.key === 'commodity') {
                     if (filterValue === 'all') {
-                      return selectedFilters[filter.key]?.includes(filterValue)
-                        ? 'bg-gradient-to-r from-green-200 to-emerald-200 dark:from-green-800/60 dark:to-emerald-800/60 border-green-400 dark:border-green-500 text-green-800 dark:text-green-200 hover:from-green-300 hover:to-emerald-300 dark:hover:from-green-900/70 dark:hover:to-emerald-900/70 hover:border-green-500'
-                        : 'bg-white dark:bg-gray-800 border-green-300 dark:border-green-500 text-green-700 dark:text-green-300 hover:bg-green-100 hover:border-green-400 hover:text-green-800 dark:hover:bg-green-900/40 dark:hover:border-green-400 dark:hover:text-green-200';
+                      return isActive ? 'filter-commodity-all-active' : 'filter-commodity-all-inactive';
                     } else {
-                      return selectedFilters[filter.key]?.includes(filterValue)
-                        ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-600 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 hover:text-green-800 dark:hover:text-green-200 hover:border-green-400'
-                        : 'bg-white dark:bg-gray-800 border-green-300 dark:border-green-500 text-green-600 dark:text-green-400 hover:bg-green-100 hover:border-green-400 hover:text-green-700 dark:hover:bg-green-900/40 dark:hover:border-green-400 dark:hover:text-green-300';
+                      return isActive ? 'filter-commodity-active' : 'filter-commodity-inactive';
                     }
                   }
                   
                   // Estilos por defecto para otros filtros
-                  return selectedFilters[filter.key]?.includes(filterValue)
-                    ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-600 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 hover:text-green-800 dark:hover:text-green-200 hover:border-green-400'
-                    : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 hover:border-gray-400 hover:text-gray-700 dark:hover:bg-gray-700/80 dark:hover:border-gray-500 dark:hover:text-gray-300';
+                  return isActive ? 'filter-default-active' : 'filter-default-inactive';
                 };
                 
                 return (
@@ -529,7 +521,7 @@ export function GenericTable<T = any>({
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleFilter(filter.key, filterValue)}
-                    className={`px-4 py-2 rounded-full border transition-colors ${getButtonStyles()}`}
+                    className={`standard-table-filter-button ${getButtonStyles()}`}
                   >
                     {displayValue}
                   </Button>
