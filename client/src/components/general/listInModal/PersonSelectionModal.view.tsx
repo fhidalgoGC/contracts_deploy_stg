@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { type CrmPerson } from '@/services/crm-people.service';
 import { PersonSelectionModalProps } from './PersonSelectionModal.types';
 import { usePersonSelection } from './PersonSelectionModal.hooks';
-import { useTranslation } from 'react-i18next';
+import { useLocalTranslation } from './hooks/useLocalTranslation';
 import { getDefaultTexts, getDisplayName, getOrganizationName, getPrimaryEmail, getPersonType } from './PersonSelectionModal.utils';
 import './PersonSelectionModal.css';
 
@@ -32,7 +32,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
     searchTerm
   );
 
-  const { t } = useTranslation();
+  const { t } = useLocalTranslation();
   const defaultTexts = getDefaultTexts(personType, contractType, t);
 
   // Infinite scroll handler

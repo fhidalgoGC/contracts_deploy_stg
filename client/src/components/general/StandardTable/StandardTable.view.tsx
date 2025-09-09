@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLocalTranslation } from './hooks/useLocalTranslation';
 import { MoreHorizontal, Plus, Trash2, Edit, Eye } from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,7 @@ export function GenericTable<T = any>({
   sortFieldMapping = {},
   rowSpacing = 'compact',
 }: GenericTableProps<T>) {
-  const { t } = useTranslation();
+  const { t } = useLocalTranslation();
   
   // Use hook for internal state and logic
   const {

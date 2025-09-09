@@ -9,3 +9,4 @@ export type {
 } from './StandardTable.types';
 export { getNestedValue, searchInAllColumns, getFilterButtonClass } from './StandardTable.utils';
 export { useStandardTable } from './StandardTable.hooks';
+export { useLocalTranslation as useStandardTableTranslation } from './hooks/useLocalTranslation';
