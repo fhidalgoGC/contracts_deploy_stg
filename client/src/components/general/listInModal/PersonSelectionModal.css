@@ -73,7 +73,7 @@
 }
 
 .person-selection-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  @apply grid grid-cols-1 gap-4;
 }
 
 .person-selection-card {
