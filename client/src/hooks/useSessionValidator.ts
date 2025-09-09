@@ -356,7 +356,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         restoreReduxStateFromStorage();
       } else if (!hasTokens && isAuthenticated) {
         // Redux dice que está autenticado pero no hay tokens - limpiar
-        clearSessionData();
+        clearSessionData(true); // Modo silencioso para evitar bucle
       } else if (hasTokens && isAuthenticated) {
         // Ambos tienen datos - validar sesión
         validateSession();
@@ -395,7 +395,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       
       if (event.data.type === 'FORCE_LOGOUT') {
         console.log('🔗 SYNC TABS: Logout forzado por BroadcastChannel');
-        clearSessionData();
+        clearSessionData(true); // Modo silencioso: respuesta a evento
       } else if (event.data.type === 'CONTEXT_RESTORED') {
         console.log('🔗 SYNC TABS: Contexto restaurado en otro tab, sincronizando...');
         // Solo restaurar si esta pestaña no está autenticada pero hay tokens
@@ -419,14 +419,14 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       // Si otro tab removió los tokens, cerrar sesión aquí también
       if (event.key === 'access_token' && !event.newValue && isAuthenticated) {
         console.log('🔗 SYNC TABS: Token removido en otro tab, cerrando sesión aquí...');
-        clearSessionData();
+        clearSessionData(true); // Modo silencioso para evitar bucle
         return;
       }
 
       // Si otro tab removió cualquier token crítico
       if (['jwt', 'id_token', 'refresh_token'].includes(event.key as string) && !event.newValue && isAuthenticated) {
         console.log(`🔗 SYNC TABS: Token crítico ${event.key} removido en otro tab, cerrando sesión aquí...`);
-        clearSessionData();
+        clearSessionData(true); // Modo silencioso para evitar bucle
         return;
       }
 
@@ -448,11 +448,11 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
             return;
           }
           console.log('✅ PROCESSING: Storage event de otra pestaña, procesando logout...');
-          clearSessionData();
+          clearSessionData(true); // Modo silencioso: respuesta a evento
         } catch (error) {
           // Fallback para formato anterior (solo timestamp)
           console.log('🔗 SYNC TABS: Logout detectado en otro tab (formato anterior), cerrando sesión aquí...');
-          clearSessionData();
+          clearSessionData(true); // Modo silencioso: respuesta a evento
         }
         return;
       }
@@ -481,7 +481,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       }
       
       console.log('✅ PROCESSING: Custom event de otra pestaña, procesando logout...');
-      clearSessionData();
+      clearSessionData(true); // Modo silencioso: respuesta a evento
     };
 
     window.addEventListener('storage', handleStorageChange);
