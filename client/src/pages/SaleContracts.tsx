@@ -5,7 +5,7 @@ import {
   usePageTracking,
   useNavigationHandler,
 } from "@/hooks/usePageState";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import DashboardLayout from "@/layouts/DashboardLayout/view";
 import { useCommodities } from "@/hooks/useCommodities";
 import {
   GenericTable,

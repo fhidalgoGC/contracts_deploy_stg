@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import DashboardLayout from '@/layouts/DashboardLayout/view';
 import { PurchaseContractForm } from '@/components/PurchaseContractForm/PurchaseContractForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
