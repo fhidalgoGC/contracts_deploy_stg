@@ -16,10 +16,6 @@ import { SessionValidator } from "@/components/SessionValidator";
 import Login from "@/pages/Login";
 // Lazy load heavy pages for better code splitting
 const Home = lazy(() => import("@/pages/Home"));
-const Buyers = lazy(() => import("@/pages/Buyers"));
-const CreateBuyer = lazy(() => import("@/pages/CreateBuyer"));
-const CreateSeller = lazy(() => import("@/pages/CreateSeller"));
-const Sellers = lazy(() => import("@/pages/Sellers"));
 const PurchaseContracts = lazy(() => import("@/pages/PurchaseContracts"));
 const CreatePurchaseContract = lazy(() => import("@/pages/CreatePurchaseContract"));
 const CreateSubContract = lazy(() => import("@/pages/CreateSubContract"));
@@ -45,10 +41,6 @@ function Router() {
       <Switch>
         <Route path="/" component={Login} />
         <Route path="/home" component={Home} />
-        <Route path="/buyers" component={Buyers} />
-        <Route path="/buyers/create" component={CreateBuyer} />
-        <Route path="/sellers" component={Sellers} />
-        <Route path="/sellers/create" component={CreateSeller} />
         <Route path="/purchase-contracts" component={PurchaseContracts} />
         <Route path="/purchase-contracts/create/:contractId?" component={CreatePurchaseContract} />
         <Route path="/purchase-contracts/:contractId/sub-contracts/create" component={CreateSubContract} />

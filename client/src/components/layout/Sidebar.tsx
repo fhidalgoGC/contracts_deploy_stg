@@ -18,16 +18,6 @@ const menuItems = [
     path: '/home'
   },
   {
-    key: 'buyers',
-    icon: Users,
-    path: '/buyers'
-  },
-  {
-    key: 'sellers',
-    icon: ShoppingCart,
-    path: '/sellers'
-  },
-  {
     key: 'purchaseContracts',
     icon: FileText,
     path: '/purchase-contracts'
