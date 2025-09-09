@@ -161,8 +161,9 @@ export function ContractInfoSection({
   ]);
 
   // Extract subcategory_id from commodity data
-  // Note: subcategory is not available in current commodity data structure
-  const subcategoryId = undefined;
+  // Since subcategory is not available in current commodity data structure,
+  // we'll try with a default or empty string for now
+  const subcategoryId = selectedCommodityId || "";
 
   const {
     data: characteristicsConfigurations = [],

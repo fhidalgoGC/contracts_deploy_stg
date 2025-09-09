@@ -35,7 +35,7 @@ export function useCharacteristicsConfigurations({
   return useQuery<CharacteristicsConfigurationOption[]>({
     queryKey: ['characteristics-configurations', commodityId, subcategoryId],
     queryFn: async () => {
-      if (!commodityId || !subcategoryId) {
+      if (!commodityId) {
         return [];
       }
 
@@ -69,7 +69,7 @@ export function useCharacteristicsConfigurations({
         partitionKey: partitionKey
       });
 
-      const url = `${environment.SSM_BASE_URL}/chars-configs/summary?commodity_id=${commodityId}&subcategory_id=${subcategoryId}`;
+      const url = `${environment.SSM_BASE_URL}/chars-configs/summary?commodity_id=${commodityId}${subcategoryId ? `&subcategory_id=${subcategoryId}` : ''}`;
       
       console.log('Characteristics configurations URL:', url);
       console.log('Making request with token:', authToken.substring(0, 50) + '...');
@@ -122,7 +122,7 @@ export function useCharacteristicsConfigurations({
 
       return mappedConfigurations;
     },
-    enabled: !!(commodityId && subcategoryId),
+    enabled: !!commodityId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000 // 10 minutes
   });
