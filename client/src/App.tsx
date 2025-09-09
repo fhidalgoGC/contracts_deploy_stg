@@ -12,6 +12,7 @@ import "./common/utils/i18n";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { useStateRestoration } from "@/hooks/usePageState";
 import { SessionValidator } from "@/components/SessionValidator";
+import { useLocation } from "wouter";
 import AppRoutes from "@/routes";
 
 function StateRestorer() {
@@ -21,7 +22,27 @@ function StateRestorer() {
 
 function AppContent() {
   const { isLoadingOrganizations } = useUser();
+  const [, setLocation] = useLocation();
   
+  // Escuchar eventos de logout automático desde el interceptor
+  useEffect(() => {
+    const handleAutoLogout = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('🔄 AUTO-LOGOUT: Evento recibido, redirigiendo con Wouter...', customEvent.detail);
+      
+      // Redirigir al login usando Wouter
+      setLocation('/');
+    };
+
+    // Agregar listener para el evento personalizado
+    window.addEventListener('autoLogout', handleAutoLogout);
+
+    // Cleanup: remover el listener al desmontar
+    return () => {
+      window.removeEventListener('autoLogout', handleAutoLogout);
+    };
+  }, [setLocation]);
+
   return (
     <SessionValidator>
       <StateRestorer />

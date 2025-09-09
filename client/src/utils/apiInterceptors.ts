@@ -10,6 +10,7 @@ export interface InterceptorOptions {
 /**
  * Función standalone para logout automático (sin hooks)
  * Se ejecuta cuando se recibe un 401 desde el interceptor
+ * Emite un evento personalizado para que los componentes de React manejen la redirección
  */
 export const performAutoLogout = () => {
   console.log('🔐 AUTO-LOGOUT: Sesión expirada (401), realizando logout automático...');
@@ -58,9 +59,12 @@ export const performAutoLogout = () => {
     console.log('📻 AUTO-LOGOUT: No se pudo notificar a otros tabs:', error);
   }
 
-  // Redirigir a login usando window.location para asegurar que funcione
-  console.log('🔄 AUTO-LOGOUT: Redirigiendo a login...');
-  window.location.href = '/';
+  // Emitir evento personalizado para que los componentes React manejen la redirección con Wouter
+  const autoLogoutEvent = new CustomEvent('autoLogout', {
+    detail: { reason: 'unauthorized', timestamp: Date.now() }
+  });
+  window.dispatchEvent(autoLogoutEvent);
+  console.log('🔄 AUTO-LOGOUT: Evento emitido para redirección con Wouter');
 };
 
 /**
