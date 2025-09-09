@@ -136,9 +136,13 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
   };
 
   // Use the stored name from form state for display, or find in current data
-  const selectedSellerData = selectedSellerName 
-    ? { _id: selectedSeller, full_name: selectedSellerName } 
-    : sellers.find(seller => seller._id === selectedSeller);
+  const selectedSellerData = sellers.find(seller => seller._id === selectedSeller) || 
+    (selectedSellerName ? { 
+      _id: selectedSeller, 
+      full_name: selectedSellerName,
+      person_type: 'natural_person' as const,
+      organization_name: undefined
+    } : undefined);
 
   return (
     <div className="space-y-2">
