@@ -119,11 +119,13 @@ export const useAuth = () => {
         const channel = new BroadcastChannel('session_sync');
         const { getTabId } = require('@/utils/tabId');
         const tabId = getTabId();
-        channel.postMessage({ 
+        const loginMessage = { 
           type: 'LOGIN_COMPLETED', 
           timestamp: Date.now(),
           tabId: tabId 
-        });
+        };
+        console.log('📻 SENDING LOGIN: Enviando evento desde tabId:', tabId, loginMessage);
+        channel.postMessage(loginMessage);
         channel.close();
         console.log('📡 LOGIN: Login completado - notificando a otras pestañas');
       } catch (error) {
