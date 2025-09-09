@@ -53,10 +53,16 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
     }
   }, [isOpen]);
 
-  // Reset search
+  // Reset search - only search when 2+ characters
   useEffect(() => {
-    if (searchTerm.trim()) {
+    const trimmedSearch = searchTerm.trim();
+    if (trimmedSearch.length >= 2) {
       // When searching, reset pagination and load first page
+      setCurrentPage(1);
+      setHasMore(true);
+      loadSellers(1, true);
+    } else if (trimmedSearch.length === 0) {
+      // When search is cleared, reload without search
       setCurrentPage(1);
       setHasMore(true);
       loadSellers(1, true);
@@ -73,10 +79,15 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
       }
       // Note: loading state is already set in useEffect for reset case
 
-      // Call the appropriate service based on contract type
+      // Call the appropriate service based on contract type with search
+      const searchOptions = {
+        page, 
+        limit: 5,
+        ...(searchTerm.trim().length >= 2 && { search: searchTerm.trim() })
+      };
       const response = contractType === "sale" 
-        ? await getBuyers({ page, limit: 5 })
-        : await getSellers({ page, limit: 5 });
+        ? await getBuyers(searchOptions)
+        : await getSellers(searchOptions);
       console.log(`✅ SellerModal: Loaded ${response.data.length} ${participantType}`);
       console.log(`📊 SellerModal: Pagination - Page ${response._meta.page_number}/${response._meta.total_pages}, Total: ${response._meta.total_elements}`);
       
@@ -112,21 +123,8 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
     }
   };
 
-  // Filter sellers based on search term
-  const filteredSellers = useMemo(() => {
-    if (!searchTerm.trim()) return sellers;
-    
-    const search = searchTerm.toLowerCase();
-    return sellers.filter(seller => {
-      const fullName = seller.full_name?.toLowerCase() || '';
-      const orgName = seller.organization_name?.toLowerCase() || '';
-      const email = seller.emails?.find(e => e.type === 'principal')?.value?.toLowerCase() || '';
-      
-      return fullName.includes(search) || 
-             orgName.includes(search) || 
-             email.includes(search);
-    });
-  }, [sellers, searchTerm]);
+  // Don't use local filtering - results come filtered from API
+  const filteredSellers = sellers;
 
   const handleSelectSeller = (seller: CrmPerson) => {
     onSelect({

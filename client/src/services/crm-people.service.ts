@@ -98,10 +98,13 @@ export const getPeople = async (
   }
 
   if (filters.search) {
+    const searchRegex = `.*${filters.search}`;
     filterObj.$or = [
-      { full_name: { $regex: filters.search, $options: "i" } },
-      { organization_name: { $regex: filters.search, $options: "i" } },
-      { "emails.value": { $regex: filters.search, $options: "i" } },
+      { full_name: { $regex: searchRegex, $options: "i" } },
+      { first_name: { $regex: searchRegex, $options: "i" } },
+      { last_name: { $regex: searchRegex, $options: "i" } },
+      { organization_name: { $regex: searchRegex, $options: "i" } },
+      { "emails.value": { $regex: searchRegex, $options: "i" } },
     ];
   }
 
