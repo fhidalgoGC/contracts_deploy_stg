@@ -6,7 +6,7 @@ import { PurchaseContractForm } from '@/components/PurchaseContractForm/Purchase
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { PurchaseSaleContract } from '@/types/purchaseSaleContract.types';
-import { getContractById } from '@/services/contracts/service';
+import { getContractById } from '@/services/contracts/contracts.service';
 
 export default function ViewContract() {
   const { t } = useTranslation();

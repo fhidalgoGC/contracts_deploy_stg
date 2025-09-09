@@ -20,7 +20,7 @@ import { useMeasurementUnits } from '@/hooks/useMeasurementUnits';
 import { DatePicker } from '@/components/ui/datepicker';
 import { formatNumber } from '@/lib/numberFormatter';
 import { NUMBER_FORMAT_CONFIG } from '@/environment/environment';
-import { SubContractService, CreateSubContractPayload } from '@/services/subContract/service';
+import { SubContractService, CreateSubContractPayload } from '@/services/subContract/subContract.service';
 import { QuantityActualOverview } from '@/components/contracts/QuantityActualOverview';
 
 // Sub-contract form validation schema with business rules

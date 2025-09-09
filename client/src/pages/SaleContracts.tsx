@@ -18,7 +18,7 @@ import { formatNumber } from "@/lib/numberFormatter";
 import {
   fetchContractsData,
   generateContractId,
-} from "@/services/contracts/service";
+} from "@/services/contracts/contracts.service";
 import {
   DropdownMenu,
   DropdownMenuContent,

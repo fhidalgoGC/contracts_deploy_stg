@@ -40,7 +40,7 @@ export const useAuth = () => {
 
       // After successful login, fetch user identity using organization service
       const { organizationService } = await import(
-        "@/services/organization/service"
+        "@/services/organization/organization.service"
       );
       const identityData = await (organizationService as any).getCustomerInfo();
 
@@ -145,7 +145,7 @@ export const useAuth = () => {
     try {
       // Get organization information using organization service
       const { organizationService } = await import(
-        "@/services/organization/service"
+        "@/services/organization/organization.service"
       );
       const organizationResponse =
         await organizationService.getOrganizationsRaw(partitionKey);
@@ -207,7 +207,7 @@ export const useAuth = () => {
       }
 
       // Get representative people information using crm-people service
-      const { getPersonById } = await import("@/services/crm-people/service");
+      const { getPersonById } = await import("@/services/crm-people/crm-people.service");
       try {
         const peopleData = await getPersonById(representativePeopleId);
 

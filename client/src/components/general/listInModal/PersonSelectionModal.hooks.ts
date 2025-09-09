@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { type CrmPerson } from '@/services/crm-people/service';
+import { type CrmPerson } from '@/services/crm-people/crm-people.service';
 import { PersonType } from './PersonSelectionModal.types';
 import { getServiceFunction } from './PersonSelectionModal.utils';
 

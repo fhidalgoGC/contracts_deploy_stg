@@ -1,4 +1,4 @@
-import { type CrmPerson, getSellers, getBuyers, getContactVendors, getTraders } from '@/services/crm-people/service';
+import { type CrmPerson, getSellers, getBuyers, getContactVendors, getTraders } from '@/services/crm-people/crm-people.service';
 import { PersonType, PersonTexts } from './PersonSelectionModal.types';
 
 export const getServiceFunction = (personType: PersonType) => {

@@ -63,7 +63,7 @@ import {
   settleParentContract,
   settleSubContract,
   generateAndDownloadPDF,
-} from "@/services/contracts/service";
+} from "@/services/contracts/contracts.service";
 
 export default function ContractDetail() {
   const { t } = useTranslation();

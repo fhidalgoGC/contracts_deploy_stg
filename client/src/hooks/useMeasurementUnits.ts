@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { MeasurementUnitsService, MeasurementUnitOption } from '@/services/measurementUnits/service';
+import { MeasurementUnitsService, MeasurementUnitOption } from '@/services/measurementUnits/measurementUnits.service';
 
 export const useMeasurementUnits = (type?: 'weight' | 'volume') => {
   return useQuery<MeasurementUnitOption[]>({
