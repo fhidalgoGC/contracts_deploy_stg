@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User, Building2, Search, Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { type CrmPerson } from '@/services/crm-people.service';
+import { type CrmPerson } from '@/services/crm-people/service';
 import { PersonSelectionModalProps } from './PersonSelectionModal.types';
 import { usePersonSelection } from './PersonSelectionModal.hooks';
 import { useLocalTranslation } from './hooks/useLocalTranslation';

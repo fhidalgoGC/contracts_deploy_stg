@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
 import DashboardLayout from '@/layouts/DashboardLayout/view';
 import { PurchaseContractForm } from '@/components/PurchaseContractForm/PurchaseContractForm';
-import { generateContractId, submitContract } from '@/services/contracts.service';
+import { generateContractId, submitContract } from '@/services/contracts/service';
 import {
   AlertDialog,
   AlertDialogAction,
