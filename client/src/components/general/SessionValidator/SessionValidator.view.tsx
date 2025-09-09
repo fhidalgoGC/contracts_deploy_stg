@@ -1,9 +1,5 @@
-import { useSessionValidator } from '@/hooks/useSessionValidator';
-import { useActivityTracker } from '@/hooks/useActivityTracker';
-
-interface SessionValidatorProps {
-  children?: React.ReactNode;
-}
+import { SessionValidatorProps } from './SessionValidator.types';
+import { useSessionValidatorComponent } from './SessionValidator.hooks';
 
 /**
  * Componente que maneja la validación integral de sesión
@@ -14,14 +10,10 @@ interface SessionValidatorProps {
  * - Rastreo automático de actividad del usuario
  */
 export function SessionValidator({ children }: SessionValidatorProps) {
-  // Configurar el hook de validación de sesión
-  useSessionValidator({
+  // Configurar el componente de validación de sesión
+  useSessionValidatorComponent({
     showExpirationToast: true,
-    validateOnMount: true
-  });
-
-  // Configurar el rastreador de actividad
-  useActivityTracker({
+    validateOnMount: true,
     throttleTime: 30000 // Actualizar máximo cada 30 segundos
   });
 
