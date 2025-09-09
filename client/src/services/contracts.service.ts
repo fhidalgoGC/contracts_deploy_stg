@@ -169,24 +169,13 @@ export const fetchContractsDataDirect = async (
     const url = `${environment.TRM_BASE_URL}/contracts/sp-contracts?${params.toString()}`;
     console.log("Fetching contracts from:", url);
 
-    // Headers de la petición
-    const headers = {
-      _partitionkey: partitionKey,
-      accept: "*/*",
-      "accept-language": "es-419,es;q=0.9",
-      authorization: `Bearer ${idToken}`,
-      "bt-organization": partitionKey,
-      "bt-uid": partitionKey,
-      organization_id: partitionKey,
-      origin: environment.CONTRACTS_ORIGIN,
-      "pk-organization": partitionKey,
-    };
-
-    console.log("Fetching contracts with headers:", headers);
-
-    const response = await fetch(url, {
+    const response = await authenticatedFetch(url, {
       method: "GET",
-      headers: headers,
+      customHeaders: {
+        accept: "*/*",
+        "accept-language": "es-419,es;q=0.9",
+        origin: environment.CONTRACTS_ORIGIN,
+      },
     });
 
     console.log("Response status:", response.status);
@@ -394,22 +383,13 @@ export const fetchContractsData = async (params: FetchContractsParams) => {
     const url = `${environment.TRM_BASE_URL}/contracts/sp-contracts?${queryParams.toString()}`;
     console.log("📡 SERVICIO - URL completa:", url);
 
-    // Headers de la petición
-    const headers = {
-      _partitionkey: partitionKey,
-      accept: "*/*",
-      "accept-language": "es-419,es;q=0.9",
-      authorization: `Bearer ${idToken}`,
-      "bt-organization": partitionKey,
-      "bt-uid": partitionKey,
-      organization_id: partitionKey,
-      origin: environment.CONTRACTS_ORIGIN,
-      "pk-organization": partitionKey,
-    };
-
-    const response = await fetch(url, {
+    const response = await authenticatedFetch(url, {
       method: "GET",
-      headers: headers,
+      customHeaders: {
+        accept: "*/*",
+        "accept-language": "es-419,es;q=0.9",
+        origin: environment.CONTRACTS_ORIGIN,
+      },
     });
 
     if (!response.ok) {
