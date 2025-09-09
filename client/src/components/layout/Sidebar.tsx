@@ -2,8 +2,6 @@ import { Link, useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
 import { useNavigationHandler } from '@/hooks/usePageState';
 import { 
-  ShoppingCart, 
-  Users, 
   FileText, 
   ScrollText,
   Home
