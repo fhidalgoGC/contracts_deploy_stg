@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { type CrmPerson } from '@/services/crm-people.service';
 import { PersonSelectionModalProps } from './PersonSelectionModal.types';
 import { usePersonSelection } from './PersonSelectionModal.hooks';
+import { useTranslation } from 'react-i18next';
 import { getDefaultTexts, getDisplayName, getOrganizationName, getPrimaryEmail, getPersonType } from './PersonSelectionModal.utils';
 
 export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
@@ -30,7 +31,8 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
     searchTerm
   );
 
-  const defaultTexts = getDefaultTexts(personType, contractType);
+  const { t } = useTranslation();
+  const defaultTexts = getDefaultTexts(personType, contractType, t);
 
   // Infinite scroll handler
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -112,7 +114,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
             <div className="flex-1 flex flex-col items-center justify-center min-h-0">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               <p className="mt-4 text-lg font-medium">{defaultTexts.loadingMessage}</p>
-              <p className="mt-2 text-sm text-gray-500">Obteniendo datos del CRM</p>
+              <p className="mt-2 text-sm text-gray-500">{t('loadingData')}</p>
             </div>
           )}
 
@@ -156,10 +158,10 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
                             <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                              {getDisplayName(person)}
+                              {getDisplayName(person, t)}
                             </h3>
                             <Badge variant={getPersonType(person) === 'juridical_person' ? 'default' : 'secondary'}>
-                              {getPersonType(person) === 'juridical_person' ? 'Empresa' : 'Persona'}
+                              {getPersonType(person) === 'juridical_person' ? t('company') : t('person')}
                             </Badge>
                           </div>
                           
@@ -187,7 +189,7 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
               {loadingMore && (
                 <div className="flex justify-center items-center py-4">
                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                  <span className="ml-2 text-sm text-gray-500">Cargando más...</span>
+                  <span className="ml-2 text-sm text-gray-500">{t('loadingMore')}</span>
                 </div>
               )}
             </div>
