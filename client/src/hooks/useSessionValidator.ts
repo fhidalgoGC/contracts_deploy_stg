@@ -356,7 +356,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         restoreReduxStateFromStorage();
       } else if (!hasTokens && isAuthenticated) {
         // Redux dice que está autenticado pero no hay tokens - limpiar
-        clearSessionData(true); // Modo silencioso para evitar bucle
+        clearSessionData(true); // Modo silencioso: respuesta a evento
       } else if (hasTokens && isAuthenticated) {
         // Ambos tienen datos - validar sesión
         validateSession();
@@ -419,14 +419,14 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       // Si otro tab removió los tokens, cerrar sesión aquí también
       if (event.key === 'access_token' && !event.newValue && isAuthenticated) {
         console.log('🔗 SYNC TABS: Token removido en otro tab, cerrando sesión aquí...');
-        clearSessionData(true); // Modo silencioso para evitar bucle
+        clearSessionData(true); // Modo silencioso: respuesta a evento
         return;
       }
 
       // Si otro tab removió cualquier token crítico
       if (['jwt', 'id_token', 'refresh_token'].includes(event.key as string) && !event.newValue && isAuthenticated) {
         console.log(`🔗 SYNC TABS: Token crítico ${event.key} removido en otro tab, cerrando sesión aquí...`);
-        clearSessionData(true); // Modo silencioso para evitar bucle
+        clearSessionData(true); // Modo silencioso: respuesta a evento
         return;
       }
 
