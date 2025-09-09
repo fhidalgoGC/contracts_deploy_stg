@@ -224,7 +224,7 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   }, [dispatch]);
 
   // Función para limpiar la sesión
-  const clearSessionData = useCallback(() => {
+  const clearSessionData = useCallback((silent: boolean = false) => {
     if (isValidatingRef.current) return;
     isValidatingRef.current = true;
 
@@ -268,38 +268,42 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       console.log('🏠 Redirigiendo al login...');
       setLocation('/');
       
-      // DESPUÉS de redirigir: Notificar a otros tabs sobre el logout completado
-      console.log('📡 Notificando a otros tabs sobre el logout completado...');
-      
-      // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
-      const channel = new BroadcastChannel('session_sync');
-      const logoutMessage = { 
-        type: 'FORCE_LOGOUT', 
-        timestamp: Date.now(),
-        tabId: tabId.current 
-      };
-      console.log('📻 SENDING LOGOUT: Enviando evento desde tabId:', tabId.current, logoutMessage);
-      channel.postMessage(logoutMessage);
-      channel.close();
+      // DESPUÉS de redirigir: Notificar a otros tabs sobre el logout completado (solo si no es silencioso)
+      if (!silent) {
+        console.log('📡 Notificando a otros tabs sobre el logout completado...');
+        
+        // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
+        const channel = new BroadcastChannel('session_sync');
+        const logoutMessage = { 
+          type: 'FORCE_LOGOUT', 
+          timestamp: Date.now(),
+          tabId: tabId.current 
+        };
+        console.log('📻 SENDING LOGOUT: Enviando evento desde tabId:', tabId.current, logoutMessage);
+        channel.postMessage(logoutMessage);
+        channel.close();
 
-      // Método 2: Disparar evento customizado en la misma ventana
-      const customEventDetail = { 
-        timestamp: Date.now(),
-        tabId: tabId.current 
-      };
-      console.log('🎯 SENDING CUSTOM EVENT: Enviando evento desde tabId:', tabId.current, customEventDetail);
-      window.dispatchEvent(new CustomEvent('session_force_logout', { 
-        detail: customEventDetail
-      }));
+        // Método 2: Disparar evento customizado en la misma ventana
+        const customEventDetail = { 
+          timestamp: Date.now(),
+          tabId: tabId.current 
+        };
+        console.log('🎯 SENDING CUSTOM EVENT: Enviando evento desde tabId:', tabId.current, customEventDetail);
+        window.dispatchEvent(new CustomEvent('session_force_logout', { 
+          detail: customEventDetail
+        }));
 
-      // Método 3: Usar localStorage como fallback
-      localStorage.setItem('session_logout', JSON.stringify({
-        timestamp: Date.now(),
-        tabId: tabId.current
-      }));
-      setTimeout(() => {
-        localStorage.removeItem('session_logout');
-      }, 100);
+        // Método 3: Usar localStorage como fallback
+        localStorage.setItem('session_logout', JSON.stringify({
+          timestamp: Date.now(),
+          tabId: tabId.current
+        }));
+        setTimeout(() => {
+          localStorage.removeItem('session_logout');
+        }, 100);
+      } else {
+        console.log('🔇 SILENT LOGOUT: No enviando eventos (modo silencioso)');
+      }
       
       console.log('✅ LOGOUT COMPLETE: Limpieza de sesión completada');
     } finally {
