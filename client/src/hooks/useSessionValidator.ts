@@ -26,8 +26,9 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   const { toast } = useToast();
   const isValidatingRef = useRef(false);
 
-  // Generar un ID único para esta pestaña para evitar eventos redundantes
-  const tabId = useRef(`tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  // Obtener ID único para esta pestaña para evitar eventos redundantes
+  const { getTabId } = require('@/utils/tabId');
+  const tabId = useRef(getTabId());
 
   // Función para verificar si los tokens están presentes y son válidos
   const validateTokens = useCallback((): boolean => {

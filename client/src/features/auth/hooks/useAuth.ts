@@ -117,7 +117,8 @@ export const useAuth = () => {
       // Notificar a otras pestañas que se completó el login
       try {
         const channel = new BroadcastChannel('session_sync');
-        const tabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { getTabId } = require('@/utils/tabId');
+        const tabId = getTabId();
         channel.postMessage({ 
           type: 'LOGIN_COMPLETED', 
           timestamp: Date.now(),
