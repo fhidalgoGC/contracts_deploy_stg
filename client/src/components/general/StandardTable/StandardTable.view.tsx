@@ -321,5 +321,4 @@ export function GenericTable<T = any>({
 // Mantener compatibilidad con el componente anterior
 export const ContractsTable = GenericTable;
 
-// Exportación principal del componente
-export { GenericTable };
+// The GenericTable component is already exported above on line 20
