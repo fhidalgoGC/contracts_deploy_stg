@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/datepicker";
-import { PersonSelectionModal } from "../../general/listInModal/PersonSelectionModal";
+import { PersonSelectionModal } from "../../general/listInModal";
 import type { PurchaseContractFormData } from "@/validation/purchaseContract.schema";
 import { NUMBER_FORMAT_CONFIG } from "@/environment/environment";
 import { formatNumber } from "@/lib/numberFormatter";
@@ -160,10 +160,9 @@ export function ContractInfoSection({
     setValue,
   ]);
 
-  // Extract subcategory_id from commodity data (original_name_id.subcategory._id)
-  // The commodities hook stores the raw data in the 'data' property
-  const subcategoryId =
-    selectedCommodity?.data?.original_name_id?.subcategory?._id;
+  // Extract subcategory_id from commodity data
+  // Note: subcategory is not available in current commodity data structure
+  const subcategoryId = undefined;
 
   const {
     data: characteristicsConfigurations = [],
