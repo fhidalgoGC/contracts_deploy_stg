@@ -6,4 +6,6 @@ export type {
   ActionMenuItem, 
   DataFetchFunction, 
   GenericTableProps 
-} from './StandardTable.view';
+} from './StandardTable.types';
+export { getNestedValue, searchInAllColumns, getFilterButtonClass } from './StandardTable.utils';
+export { useStandardTable } from './StandardTable.hooks';

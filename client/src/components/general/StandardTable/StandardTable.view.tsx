@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MoreHorizontal, Plus, Trash2, Edit, Eye } from 'lucide-react';
 import { Link } from 'wouter';
@@ -11,136 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { GenericTableProps, FilterOption, TableColumn } from './StandardTable.types';
+import { getFilterButtonClass, getNestedValue } from './StandardTable.utils';
+import { useStandardTable } from './StandardTable.hooks';
 import './StandardTable.css';
 
-// Definición de tipos genéricos
-export interface TableColumn<T = any> {
-  key: string;
-  titleKey: string; // Clave para i18n
-  render?: (item: T) => React.ReactNode;
-  sortable?: boolean;
-  width?: string;
-  dataMapping?: string; // Ruta para acceder al dato (ej: "participants[0].name")
-}
-
-export interface FilterOption {
-  key: string;
-  value: string;
-  label: string | { key: string };
-}
-
-export interface TableFilter {
-  key: string;
-  titleKey: string;
-  type: 'button' | 'select';
-  options?: string[];
-  availableValues?: string[] | FilterOption[];
-}
-
-export interface ActionMenuItem {
-  key: string;
-  labelKey: string; // Clave para i18n
-  action: (item: any) => void;
-  className?: string;
-  icon?: React.ReactNode; // Icono opcional para mostrar como botón individual
-  showAsIcon?: boolean; // Si se debe mostrar como icono además del menú
-}
-
-export interface DataFetchFunction<T = any> {
-  (params: {
-    page: number;
-    pageSize: number;
-    search?: string;
-    filters?: Record<string, any>;
-    sort?: { key: string; direction: 'asc' | 'desc' };
-    columns?: TableColumn<T>[]; // Pasar las columnas para la búsqueda
-  }): Promise<{
-    data: T[];
-    total: number;
-    totalPages: number;
-  }>;
-}
-
-export interface GenericTableProps<T = any> {
-  // Configuración básica
-  columns: TableColumn<T>[];
-  fetchData?: DataFetchFunction<T>; // OPTIONAL: Function to fetch data (for tables that manage their own data)
-  data?: T[]; // OPTIONAL: Pre-loaded data (for controlled tables)
-  totalElements?: number; // Total elements for pagination
-  totalPages?: number; // Total pages for pagination
-  loading?: boolean; // Loading state
-  getItemId: (item: T) => string; // REQUIRED: Función para obtener ID único del item
-  title?: string;
-  titleKey?: string; // Clave para i18n del título
-  description?: string;
-  descriptionKey?: string; // Clave para i18n de la descripción
-  
-  // Botón de creación
-  createButtonLabelKey?: string;
-  createButtonHref?: string;
-  showCreateButton?: boolean;
-  
-  // Filtros
-  showFilters?: boolean;
-  filters?: TableFilter[];
-  defaultFilters?: Record<string, any>;
-  
-  // Acciones
-  showActionColumn?: boolean;
-  actionMenuItems?: ActionMenuItem[];
-  actionColumnTitleKey?: string;
-  showActionIcons?: boolean; // Nueva prop para mostrar iconos individuales
-  
-  // Callbacks for controlled mode
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  onSearchChange?: (search: string) => void;
-  onSortChange?: (sort: { key: string; direction: 'asc' | 'desc' } | null) => void;
-  
-  // Field mapping for sorting (UI field key to API field key)
-  sortFieldMapping?: Record<string, string>;
-  
-  // Row spacing
-  rowSpacing?: 'compact' | 'normal' | 'relaxed'; // compact=py-1, normal=py-2, relaxed=py-3
-
-}
-
-// Función auxiliar para obtener valor anidado usando dot notation
-function getNestedValue(obj: any, path: string): any {
-  return path.split('.').reduce((current, key) => {
-    // Manejo de arrays: "participants[0].name"
-    if (key.includes('[') && key.includes(']')) {
-      const arrayKey = key.substring(0, key.indexOf('['));
-      const index = parseInt(key.substring(key.indexOf('[') + 1, key.indexOf(']')));
-      return current?.[arrayKey]?.[index];
-    }
-    return current?.[key];
-  }, obj);
-}
-
-// Función auxiliar para buscar en todas las columnas
-function searchInAllColumns<T>(item: T, searchTerm: string, columns: TableColumn<T>[]): boolean {
-  const searchLower = searchTerm.toLowerCase();
-  
-  return columns.some(column => {
-    let value: any;
-    
-    // Si la columna tiene dataMapping, usar eso
-    if (column.dataMapping) {
-      value = getNestedValue(item, column.dataMapping);
-    } else {
-      value = (item as any)[column.key];
-    }
-    
-    // Convertir a string y buscar
-    if (value != null) {
-      const stringValue = value.toString().toLowerCase();
-      return stringValue.includes(searchLower);
-    }
-    
-    return false;
-  });
-}
 
 export function GenericTable<T = any>({
   columns,
@@ -173,77 +48,29 @@ export function GenericTable<T = any>({
 }: GenericTableProps<T>) {
   const { t } = useTranslation();
   
-  // Estados para filtros únicamente (modo no controlado) - paginación manejada por parent
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>(defaultFilters || {});
-  
-  // Estados para UI internos únicamente (no afectan API)
-  const [searchValue, setSearchValue] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const [sortKey, setSortKey] = useState<string>();
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  
-  // Estados para datos (internos - solo para modo no-controlado)
-  const [internalData, setInternalData] = useState<T[]>([]);
-  const [internalLoading, setInternalLoading] = useState(false);
-  const [internalTotalElements, setInternalTotalElements] = useState(0);
-  const [internalTotalPages, setInternalTotalPages] = useState(0);
+  // Use hook for internal state and logic
+  const {
+    selectedFilters,
+    searchValue,
+    currentPage,
+    pageSize,
+    sortKey,
+    sortDirection,
+    internalData,
+    internalLoading,
+    internalTotalElements,
+    internalTotalPages,
+    toggleFilter,
+    handlePageChange,
+    handlePageSizeChange,
+    handleSortChange,
+    handleSearchChange
+  } = useStandardTable({
+    fetchData,
+    defaultFilters,
+    columns
+  });
 
-  // Función para cargar datos con loading mínimo de 300ms (solo para modo no-controlado)
-  const loadData = async () => {
-    if (!fetchData) return; // Skip if no fetchData function provided (controlled mode)
-    
-    setInternalLoading(true);
-    const startTime = Date.now();
-    
-    try {
-      const result = await fetchData({
-        page: currentPage,
-        pageSize,
-        search: searchValue,
-        filters: selectedFilters,
-        sort: sortKey ? { key: sortKey, direction: sortDirection } : undefined,
-        columns // Pasar las columnas para la búsqueda
-      });
-      
-      // Calcular tiempo transcurrido
-      const elapsedTime = Date.now() - startTime;
-      const minLoadingTime = 300; // 300ms mínimo
-      
-      // Si han pasado menos de 300ms, esperar hasta completar el tiempo mínimo
-      if (elapsedTime < minLoadingTime) {
-        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
-      }
-      
-      setInternalData(result.data);
-      setInternalTotalElements(result.total);
-      setInternalTotalPages(result.totalPages);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      // Asegurar tiempo mínimo incluso en error
-      const elapsedTime = Date.now() - startTime;
-      const minLoadingTime = 300;
-      
-      if (elapsedTime < minLoadingTime) {
-        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
-      }
-      
-      setInternalData([]);
-      setInternalTotalElements(0);
-      setInternalTotalPages(0);
-    } finally {
-      setInternalLoading(false);
-    }
-  };
-
-
-
-  // Cargar datos cuando cambien los parámetros (solo en modo no-controlado)
-  useEffect(() => {
-    if (fetchData) {
-      loadData();
-    }
-  }, [currentPage, pageSize, searchValue, selectedFilters, sortKey, sortDirection, fetchData]);
 
   // Crear las columnas de la tabla con i18n
   const tableColumns: Column<T>[] = useMemo(() => {
@@ -363,81 +190,6 @@ export function GenericTable<T = any>({
   // Debug: Log pagination info
   console.log('🔢 PAGINACIÓN DEBUG - currentTotalElements:', currentTotalElements, 'currentTotalPages:', currentTotalPages, 'pageSize:', pageSize, 'currentPage:', currentPage);
 
-  // Función para toggle de filtros
-  const toggleFilter = (filterKey: string, value: any) => {
-    setSelectedFilters(prev => {
-      // Comportamiento especial para pricingType: solo un valor a la vez
-      if (filterKey === 'pricingType') {
-        const currentValues = prev[filterKey] || [];
-        // Si ya está seleccionado, lo deseleccionamos (permitir quitar el filtro)
-        const newValues = currentValues.includes(value) 
-          ? [] 
-          : [value]; // Solo un valor seleccionado a la vez
-        
-        return { ...prev, [filterKey]: newValues };
-      }
-      
-      // Comportamiento especial para commodity: "All" es mutuamente exclusivo
-      if (filterKey === 'commodity') {
-        const currentValues = prev[filterKey] || [];
-        
-        // Si se selecciona "all"
-        if (value === 'all') {
-          // Si "all" ya está seleccionado, no hacer nada (mantenerlo seleccionado)
-          if (currentValues.includes('all')) {
-            return prev;
-          }
-          // Si "all" no está seleccionado, seleccionarlo y deseleccionar todo lo demás
-          return { ...prev, [filterKey]: ['all'] };
-        }
-        
-        // Si se selecciona cualquier valor que no es "all"
-        // Primero remover "all" si está presente
-        let newValues = currentValues.filter((v: any) => v !== 'all');
-        
-        // Luego aplicar la lógica normal de toggle
-        if (newValues.includes(value)) {
-          newValues = newValues.filter((v: any) => v !== value);
-          // Si no queda ningún valor seleccionado, volver a "all"
-          if (newValues.length === 0) {
-            newValues = ['all'];
-          }
-        } else {
-          newValues = [...newValues, value];
-        }
-        
-        return { ...prev, [filterKey]: newValues };
-      }
-      
-      // Comportamiento por defecto para otros filtros (múltiple selección)
-      const currentValues = prev[filterKey] || [];
-      const newValues = Array.isArray(currentValues)
-        ? (currentValues.includes(value) 
-            ? currentValues.filter(v => v !== value)
-            : [...currentValues, value])
-        : [value];
-      
-      return { ...prev, [filterKey]: newValues };
-    });
-    setCurrentPage(1);
-  };
-
-  // Handlers para la tabla
-  const handlePageChange = (page: number) => setCurrentPage(page);
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
-  const handleSortChange = (key: string, direction: 'asc' | 'desc') => {
-    setSortKey(key);
-    setSortDirection(direction);
-  };
-  const handleSearchChange = (search: string) => {
-    if (search !== searchValue) {
-      setSearchValue(search);
-      setCurrentPage(1);
-    }
-  };
 
   return (
     <div className="standard-table-container">
@@ -488,32 +240,12 @@ export function GenericTable<T = any>({
                 const filterValue = isObject ? (value as FilterOption).value : value as string;
                 const uniqueKey = isObject ? (value as FilterOption).key : value as string;
                 
-                // Definir clases CSS específicas para pricing type
-                const getButtonStyles = () => {
-                  const isActive = selectedFilters[filter.key]?.includes(filterValue);
-                  
-                  if (filter.key === 'pricingType') {
-                    if (filterValue === 'all') {
-                      return isActive ? 'filter-pricing-all-active' : 'filter-pricing-all-inactive';
-                    } else if (filterValue === 'basis') {
-                      return isActive ? 'filter-pricing-basis-active' : 'filter-pricing-basis-inactive';
-                    } else if (filterValue === 'fixed') {
-                      return isActive ? 'filter-pricing-fixed-active' : 'filter-pricing-fixed-inactive';
-                    }
-                  }
-                  
-                  // Estilos específicos para commodity
-                  if (filter.key === 'commodity') {
-                    if (filterValue === 'all') {
-                      return isActive ? 'filter-commodity-all-active' : 'filter-commodity-all-inactive';
-                    } else {
-                      return isActive ? 'filter-commodity-active' : 'filter-commodity-inactive';
-                    }
-                  }
-                  
-                  // Estilos por defecto para otros filtros
-                  return isActive ? 'filter-default-active' : 'filter-default-inactive';
-                };
+                // Obtener clases CSS usando la función utilitaria
+                const buttonStyles = getFilterButtonClass(
+                  filter.key,
+                  filterValue,
+                  selectedFilters
+                );
                 
                 return (
                   <Button
@@ -521,7 +253,7 @@ export function GenericTable<T = any>({
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleFilter(filter.key, filterValue)}
-                    className={`standard-table-filter-button ${getButtonStyles()}`}
+                    className={`standard-table-filter-button ${buttonStyles}`}
                   >
                     {displayValue}
                   </Button>
@@ -537,11 +269,11 @@ export function GenericTable<T = any>({
         columns={tableColumns}
         data={tableDataStructure}
         onPageChange={(page) => {
-          setCurrentPage(page);
+          handlePageChange(page);
           onPageChange?.(page); // Call parent callback
         }}
         onPageSizeChange={(size) => {
-          setPageSize(size);
+          handlePageSizeChange(size);
           onPageSizeChange?.(size); // Call parent callback
         }}
         onSortChange={(keyOrSort: string | { key: string; direction: 'asc' | 'desc' }, direction?: 'asc' | 'desc') => {
@@ -559,20 +291,18 @@ export function GenericTable<T = any>({
             sortDirection = direction;
           } else {
             // No sort or invalid format
-            setSortKey(undefined);
-            setSortDirection('asc');
+            handleSortChange('', 'asc');
             onSortChange?.(null);
             return;
           }
           
-          setSortKey(sortKey);
-          setSortDirection(sortDirection);
+          handleSortChange(sortKey, sortDirection);
           // Map UI field to API field for parent callback
           const apiFieldKey = sortFieldMapping[sortKey] || sortKey;
           onSortChange?.({ key: apiFieldKey, direction: sortDirection });
         }}
         onSearchChange={(search) => {
-          setSearchValue(search);
+          handleSearchChange(search);
           onSearchChange?.(search); // Call parent callback
         }}
         currentPage={currentPage}
