@@ -202,7 +202,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
             </div>
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-4xl w-full max-w-4xl h-[80vh] max-h-[80vh] flex flex-col">
+        <DialogContent className="sm:max-w-4xl w-full max-w-4xl h-[80vh] max-h-[80vh] flex flex-col p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <User className="h-5 w-5" />
@@ -210,7 +210,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
             </DialogTitle>
           </DialogHeader>
           
-          <div className="flex-1 flex flex-col space-y-4 min-h-0">
+          <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden">
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -224,7 +224,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
 
             {/* Loading */}
             {loading && (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-96">
+              <div className="flex-1 flex flex-col items-center justify-center min-h-0">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 <p className="mt-4 text-lg font-medium">{contractType === "sale" ? "Cargando compradores..." : "Cargando vendedores..."}</p>
                 <p className="mt-2 text-sm text-gray-500">Obteniendo datos del CRM</p>
@@ -233,7 +233,7 @@ export const SellerSelectionModal: React.FC<SellerSelectionModalProps> = ({
 
             {/* Results */}
             {!loading && (
-              <div className="flex-1 min-h-96 max-h-96 overflow-y-auto" onScroll={handleScroll}>
+              <div className="flex-1 min-h-0 overflow-y-auto pr-2" onScroll={handleScroll}>
                 {filteredSellers.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
