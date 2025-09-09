@@ -72,7 +72,7 @@ export const usePersonSelection = (personType: PersonType, isOpen: boolean, sear
 
       const searchOptions = {
         page, 
-        limit: 5,
+        limit: 10,
         ...(searchTerm.trim().length >= 2 && { search: searchTerm.trim() })
       };
 
