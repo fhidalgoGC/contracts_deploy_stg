@@ -201,7 +201,11 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
         // Notificar a otros tabs que se restauró el contexto
         try {
           const channel = new BroadcastChannel('session_sync');
-          channel.postMessage({ type: 'CONTEXT_RESTORED', timestamp: Date.now() });
+          channel.postMessage({ 
+            type: 'CONTEXT_RESTORED', 
+            timestamp: Date.now(),
+            tabId: tabId.current 
+          });
           channel.close();
         } catch (error) {
           console.log('📻 BROADCAST: No se pudo notificar a otros tabs:', error);
@@ -360,6 +364,13 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     const channel = new BroadcastChannel('session_sync');
     const handleBroadcastMessage = (event: MessageEvent) => {
       console.log('📻 BROADCAST MESSAGE:', event.data);
+      
+      // Verificar si el evento viene de la misma pestaña
+      if (event.data.tabId && event.data.tabId === tabId.current) {
+        console.log('🚫 IGNORED: Evento de la misma pestaña, ignorando...');
+        return;
+      }
+      
       if (event.data.type === 'FORCE_LOGOUT') {
         console.log('🔗 SYNC TABS: Logout forzado por BroadcastChannel');
         clearSessionData();
@@ -399,8 +410,20 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
 
       // Si se disparó un evento de logout desde otro tab
       if (event.key === 'session_logout' && event.newValue && isAuthenticated) {
-        console.log('🔗 SYNC TABS: Logout detectado en otro tab, cerrando sesión aquí...');
-        clearSessionData();
+        try {
+          const logoutData = JSON.parse(event.newValue);
+          // Verificar si el evento viene de la misma pestaña
+          if (logoutData.tabId && logoutData.tabId === tabId.current) {
+            console.log('🚫 IGNORED: Evento de logout de la misma pestaña, ignorando...');
+            return;
+          }
+          console.log('🔗 SYNC TABS: Logout detectado en otro tab, cerrando sesión aquí...');
+          clearSessionData();
+        } catch (error) {
+          // Fallback para formato anterior (solo timestamp)
+          console.log('🔗 SYNC TABS: Logout detectado en otro tab (formato anterior), cerrando sesión aquí...');
+          clearSessionData();
+        }
         return;
       }
 
@@ -411,8 +434,15 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
     };
 
     // Método 3: Eventos personalizados (para la misma ventana)
-    const handleCustomLogout = () => {
+    const handleCustomLogout = (event: any) => {
       console.log('🔗 SYNC TABS: Logout custom event detectado');
+      
+      // Verificar si el evento viene de la misma pestaña
+      if (event.detail?.tabId && event.detail.tabId === tabId.current) {
+        console.log('🚫 IGNORED: Custom event de la misma pestaña, ignorando...');
+        return;
+      }
+      
       clearSessionData();
     };
 
