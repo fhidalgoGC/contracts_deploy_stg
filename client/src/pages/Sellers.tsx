@@ -56,9 +56,6 @@ export default function Sellers() {
 
   console.log("Sellers component render:", { data, isLoading, currentPage });
 
-  const handleAddSeller = () => {
-    setLocation("/sellers/create");
-  };
 
   const columns: Column<Seller>[] = [
     {
@@ -134,8 +131,6 @@ export default function Sellers() {
           onPageSizeChange={handlePageSizeChange}
           onSortChange={handleSortChange}
           onSearchChange={handleSearchChange}
-          onAddNew={handleAddSeller}
-          addButtonLabel={t("addSeller")}
           getItemId={(seller) => seller._id}
         />
       </div>

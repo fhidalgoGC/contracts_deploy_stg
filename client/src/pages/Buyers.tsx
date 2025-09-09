@@ -55,9 +55,6 @@ export default function Buyers() {
 
   console.log('Buyers component render:', { data, isLoading, currentPage });
 
-  const handleAddBuyer = () => {
-    setLocation('/buyers/create');
-  };
 
   const columns: Column<Buyer>[] = [
     {
@@ -130,7 +127,6 @@ export default function Buyers() {
           onPageSizeChange={handlePageSizeChange}
           onSortChange={handleSortChange}
           onSearchChange={handleSearchChange}
-          onAddNew={handleAddBuyer}
           getItemId={(buyer) => buyer._id}
         />
       </div>
