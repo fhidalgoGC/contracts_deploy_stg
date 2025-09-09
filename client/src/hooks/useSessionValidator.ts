@@ -5,6 +5,7 @@ import { logout as logoutAction, login as loginAction } from '@/features/auth/sl
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import { environment } from '@/environment/environment';
+import { getTabId } from '@/utils/tabId';
 
 interface SessionValidatorOptions {
   // Si se debe mostrar un toast cuando la sesión expira
@@ -27,7 +28,6 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   const isValidatingRef = useRef(false);
 
   // Obtener ID único para esta pestaña para evitar eventos redundantes
-  const { getTabId } = require('@/utils/tabId');
   const tabId = useRef(getTabId());
 
   // Función para verificar si los tokens están presentes y son válidos

@@ -9,6 +9,7 @@ import {
 import { useLoginMutation, useGetIdentityQuery } from "../services/authApi";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { getTabId } from "@/utils/tabId";
 
 export const useAuth = () => {
   const [, setLocation] = useLocation();
@@ -117,7 +118,6 @@ export const useAuth = () => {
       // Notificar a otras pestañas que se completó el login
       try {
         const channel = new BroadcastChannel('session_sync');
-        const { getTabId } = require('@/utils/tabId');
         const tabId = getTabId();
         const loginMessage = { 
           type: 'LOGIN_COMPLETED', 
