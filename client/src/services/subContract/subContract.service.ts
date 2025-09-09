@@ -17,9 +17,7 @@ export class SubContractService {
       
       const response = await authenticatedFetch(this.BASE_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+
         body: JSON.stringify({})
       });
       
@@ -64,9 +62,7 @@ export class SubContractService {
       
       const response = await authenticatedFetch(`${this.BASE_URL}/${key}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+
         body: JSON.stringify(payload)
       });
       

@@ -70,9 +70,7 @@ export const getPeople = async (
   try {
     const response = await authenticatedFetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
     });
 
     if (!response.ok) {
@@ -100,9 +98,7 @@ export const getPersonById = async (personId: string): Promise<CrmPerson> => {
   try {
     const response = await authenticatedFetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
     });
 
     if (!response.ok) {
@@ -167,9 +163,6 @@ export const createPersonId = async (): Promise<string> => {
 
   const response = await authenticatedFetch(`${environment.CRM_BASE_URL}/crm-people/people`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       _partitionKey: `organization_id=${partitionKey}`
     }),
@@ -192,9 +185,7 @@ export const createBuyer = async (buyerId: string, buyerData: any): Promise<any>
     `${environment.CRM_BASE_URL}/crm-people/people/${buyerId}`,
     {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
       body: JSON.stringify(buyerData),
     }
   );
@@ -216,9 +207,7 @@ export const createSeller = async (sellerId: string, sellerData: any): Promise<a
     `${environment.CRM_BASE_URL}/crm-people/people/${sellerId}`,
     {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
       body: JSON.stringify(sellerData),
     }
   );
@@ -240,14 +229,6 @@ export const createPersonLocation = async (locationData: any): Promise<any> => {
   
   const response = await authenticatedFetch(`${environment.CRM_BASE_URL}/crm-locations/address`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "_partitionkey": partitionKey || "",
-      "bt-organization": partitionKey || "",
-      "bt-uid": partitionKey || "",
-      "organization_id": partitionKey || "",
-      "pk-organization": partitionKey || "",
-    },
     body: JSON.stringify(locationData),
   });
 

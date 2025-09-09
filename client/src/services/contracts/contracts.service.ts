@@ -432,9 +432,6 @@ export const generateContractId = async (): Promise<string | null> => {
       `${environment.TRM_BASE_URL}/contracts/sp-contracts`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
         body: "",
       },
     );
@@ -533,9 +530,6 @@ export const submitContract = async (
 
     const response = await authenticatedFetch(url, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
       body: JSON.stringify(contractData),
     });
 
