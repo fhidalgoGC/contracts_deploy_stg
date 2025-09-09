@@ -116,7 +116,7 @@ export default function Buyers() {
 
         <DataTable
           columns={columns}
-          data={data || null}
+          data={data as TableData<Buyer> | null}
           loading={isLoading}
           currentPage={currentPage}
           pageSize={pageSize}
