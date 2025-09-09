@@ -240,21 +240,21 @@ export default function NavBar({ title }: NavBarProps) {
   };
 
   return (
-    <nav className="navbar h-12 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200/30 dark:border-gray-700/30 px-6 flex items-center justify-between">
+    <nav className="navbar">
       {/* Left side - Breadcrumbs */}
-      <div className="flex items-center">
+      <div className="navbar__left">
         {breadcrumbs.length > 0 ? (
-          <div className="flex items-center space-x-2">
+          <div className="navbar__breadcrumbs">
             {breadcrumbs.map((breadcrumb, index) => (
-              <div key={index} className="flex items-center space-x-2">
+              <div key={index} className="navbar__breadcrumb-item">
                 {breadcrumb.isActive ? (
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <span className="navbar__breadcrumb-active">
                     {breadcrumb.label}
                   </span>
                 ) : (
                   <Link href={breadcrumb.path}>
                     <span 
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
+                      className="navbar__breadcrumb-link"
                       onClick={() => {
                         // Notificar navegación jerárquica según la ruta
                         if (breadcrumb.path === '/purchase-contracts') {
@@ -273,20 +273,20 @@ export default function NavBar({ title }: NavBarProps) {
                   </Link>
                 )}
                 {index < breadcrumbs.length - 1 && (
-                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <ChevronRight className="navbar__chevron-icon" />
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <h1 className="text-base font-semibold text-gray-900 dark:text-white">
+          <h1 className="navbar__title">
             {title}
           </h1>
         )}
       </div>
 
       {/* Right side - Theme toggle, Organization selector, Language selector and User menu */}
-      <div className="flex items-center space-x-2">
+      <div className="navbar__right">
         {/* Theme Toggle */}
         <ThemeToggle />
         
