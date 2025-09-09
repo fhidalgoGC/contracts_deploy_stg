@@ -320,3 +320,6 @@ export function GenericTable<T = any>({
 
 // Mantener compatibilidad con el componente anterior
 export const ContractsTable = GenericTable;
+
+// Exportación principal del componente
+export { GenericTable };
