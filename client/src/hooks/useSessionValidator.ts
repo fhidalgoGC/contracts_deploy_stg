@@ -26,6 +26,9 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
   const { toast } = useToast();
   const isValidatingRef = useRef(false);
 
+  // Generar un ID único para esta pestaña para evitar eventos redundantes
+  const tabId = useRef(`tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+
   // Función para verificar si los tokens están presentes y son válidos
   const validateTokens = useCallback((): boolean => {
     try {
@@ -263,16 +266,26 @@ export const useSessionValidator = (options: SessionValidatorOptions = {}) => {
       
       // Método 1: Usar BroadcastChannel para comunicación directa entre tabs
       const channel = new BroadcastChannel('session_sync');
-      channel.postMessage({ type: 'FORCE_LOGOUT', timestamp: Date.now() });
+      channel.postMessage({ 
+        type: 'FORCE_LOGOUT', 
+        timestamp: Date.now(),
+        tabId: tabId.current 
+      });
       channel.close();
 
       // Método 2: Disparar evento customizado en la misma ventana
       window.dispatchEvent(new CustomEvent('session_force_logout', { 
-        detail: { timestamp: Date.now() } 
+        detail: { 
+          timestamp: Date.now(),
+          tabId: tabId.current 
+        } 
       }));
 
       // Método 3: Usar localStorage como fallback
-      localStorage.setItem('session_logout', Date.now().toString());
+      localStorage.setItem('session_logout', JSON.stringify({
+        timestamp: Date.now(),
+        tabId: tabId.current
+      }));
       setTimeout(() => {
         localStorage.removeItem('session_logout');
       }, 100);
