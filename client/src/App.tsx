@@ -25,8 +25,10 @@ const ViewContract = lazy(() => import("@/pages/ViewContract"));
 const EditContract = lazy(() => import("@/pages/EditContract"));
 const SaleContracts = lazy(() => import("@/pages/SaleContracts"));
 const CreateSaleContract = lazy(() => import("@/pages/CreateSaleContract"));
-const ContractDetail = lazy(() => import("@/pages/ContractDetail"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+
+// Import ContractDetail normally instead of lazy loading to fix module loading issue
+import ContractDetail from "@/pages/ContractDetail";
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
