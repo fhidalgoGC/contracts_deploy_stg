@@ -123,3 +123,53 @@
 .person-selection-load-more-text {
   @apply ml-2 text-sm text-gray-500;
 }
+
+/* Additional specific styles */
+
+.person-selection-trigger-icon {
+  @apply mr-2 h-4 w-4;
+}
+
+.person-selection-trigger-content {
+  @apply flex flex-col items-start;
+}
+
+.person-selection-trigger-text {
+  @apply text-sm;
+}
+
+.person-selection-trigger-subtext {
+  @apply text-xs text-gray-500 dark:text-gray-400 mt-1;
+}
+
+.person-selection-title {
+  @apply flex items-center space-x-2;
+}
+
+.person-selection-title-icon {
+  @apply h-5 w-5;
+}
+
+.person-selection-search-container {
+  @apply relative;
+}
+
+.person-selection-search-icon {
+  @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4;
+}
+
+.person-selection-search-loading-container {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+}
+
+.person-selection-search-loading-icon {
+  @apply animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600;
+}
+
+.person-selection-organization-icon {
+  @apply inline h-3 w-3 mr-1;
+}
+
+.person-selection-email-icon {
+  @apply inline h-3 w-3 mr-1;
+}

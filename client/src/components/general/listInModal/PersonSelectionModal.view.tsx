@@ -70,13 +70,13 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
           } ${selectedPersonName ? 'selected' : 'placeholder'}`}
           data-testid={`button-select-${personType}`}
         >
-          <User className="mr-2 h-4 w-4" />
-          <div className="flex flex-col items-start">
-            <span className="text-sm">
+          <User className="person-selection-trigger-icon" />
+          <div className="person-selection-trigger-content">
+            <span className="person-selection-trigger-text">
               {selectedPersonName || triggerButtonText || defaultTexts.triggerText}
             </span>
             {selectedPersonName && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <span className="person-selection-trigger-subtext">
                 {triggerButtonText || defaultTexts.triggerText}
               </span>
             )}
@@ -85,16 +85,16 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
       </DialogTrigger>
       <DialogContent className="person-selection-dialog">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <User className="h-5 w-5" />
+          <DialogTitle className="person-selection-title">
+            <User className="person-selection-title-icon" />
             <span>{modalTitle || defaultTexts.modalTitle}</span>
           </DialogTitle>
         </DialogHeader>
         
         <div className="person-selection-container">
           {/* Search Input */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <div className="person-selection-search-container">
+            <Search className="person-selection-search-icon" />
             <Input
               placeholder={searchPlaceholder || defaultTexts.searchPlaceholder}
               value={searchTerm}
@@ -104,8 +104,8 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
             />
             {/* Search loading indicator */}
             {searchLoading && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <div className="person-selection-search-loading-container">
+                <div className="person-selection-search-loading-icon"></div>
               </div>
             )}
           </div>
@@ -168,14 +168,14 @@ export const PersonSelectionModalView: React.FC<PersonSelectionModalProps> = ({
                           
                           {getOrganizationName(person) && (
                             <p className="person-selection-organization">
-                              <Building2 className="inline h-3 w-3 mr-1" />
+                              <Building2 className="person-selection-organization-icon" />
                               {getOrganizationName(person)}
                             </p>
                           )}
                           
                           {getPrimaryEmail(person) && (
                             <p className="person-selection-email">
-                              <Mail className="inline h-3 w-3 mr-1" />
+                              <Mail className="person-selection-email-icon" />
                               {getPrimaryEmail(person)}
                             </p>
                           )}
